@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:profile_ui/widget/divider.dart';
 import 'package:profile_ui/widget/profile_desc.dart';
 import 'package:profile_ui/widget/profile_image.dart';
@@ -26,52 +25,28 @@ class ProfilePage extends StatefulWidget {
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
+
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   bool _showDetails = false;
 
-  // This function will be called to toggle the details view
+  
   void toggleDetails(double width) {
-    print(width);
+    
     setState(() {
       _showDetails = !_showDetails;
     });
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _setOrientationBasedOnRotation();
-  }
-
-  // Function to detect the orientation and set the app's orientation lock
-  void _setOrientationBasedOnRotation() {
-    double screenWidth = MediaQuery.of(context).size.width;
-    
-    // Lock orientation based on the width of the screen (tablet or larger)
-    if (screenWidth > 600) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeRight,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.portraitUp,
-      ]);
-    } else {
-      // Lock portrait when device is upside down (portraitUp and portraitDown)
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+   
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 253, 245),
@@ -88,7 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   flex: 1,
                   child: SingleChildScrollView(
                     child: GestureDetector(
-                      onTap: ()=> toggleDetails(screenWidth),
+                      onTap: () => toggleDetails(screenWidth),
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -144,18 +119,5 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
     );
-  }
-  
-  // Reset orientation preferences when widget is disposed
-  @override
-  void dispose() {
-    // Reset the orientation lock when the widget is disposed
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    super.dispose();
   }
 }
