@@ -9,6 +9,7 @@ class ValidationPage extends StatefulWidget {
 }
 
 class _ValidationPageState extends State<ValidationPage> {
+
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
@@ -17,6 +18,7 @@ class _ValidationPageState extends State<ValidationPage> {
   bool _obscurePassword = true;
 
   String? emailValidator(String? value) {
+
     if (value == null || value.isEmpty) {
       return 'Please enter an email';
     }
@@ -31,16 +33,39 @@ class _ValidationPageState extends State<ValidationPage> {
   }
 
   String? passwordValidator(String? value) {
+
     if (value == null || value.isEmpty) {
       return 'Please enter a password';
     }
 
+    
     if (value.length < 6) {
       return 'Password must be at least 6 characters long';
     }
 
+    
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return 'least one uppercase letter required';
+    }
+
+  
+    if (!RegExp(r'\d').hasMatch(value)) {
+      return 'least one digit required';
+    }
+
+    
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+      return 'least one special character required';
+    }
+
+    
+    if (value.contains(' ')) {
+      return 'Password cannot contain spaces';
+    }
+
     return null;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +133,10 @@ class _ValidationPageState extends State<ValidationPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
+
+                        //saving the current state
+                        _formKey.currentState!.save();
+
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (context) => HomePage(
