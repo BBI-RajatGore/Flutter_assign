@@ -10,7 +10,10 @@ class PostProvider with ChangeNotifier {
 
   List<Post> _searchedPost = [];
 
-  List<Post> get posts => _searchedPost;
+  List<Post> get searchedPost => _searchedPost;
+
+  List<Post> get allPost => _allPost;
+
 
   Future<void> fetchDataFromApi() async {
 

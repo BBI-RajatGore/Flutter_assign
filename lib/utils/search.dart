@@ -34,14 +34,14 @@ class PostSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     postProvider.filterDataFromSearch(query);
-    final filteredPosts = postProvider.posts;
+    final filteredPosts = postProvider.searchedPost;
     return _buildSearchResults(filteredPosts);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     postProvider.filterDataFromSearch(query);
-    final filteredPosts = postProvider.posts;
+    final filteredPosts = postProvider.searchedPost;
     return _buildSearchResults(filteredPosts);
   }
 
@@ -59,9 +59,9 @@ class PostSearchDelegate extends SearchDelegate {
       itemCount: filteredPosts.length,
       itemBuilder: (context, index) {
         final post = filteredPosts[index];
-
         return listViewWidget(post.id, post.title, post.body);
       },
     );
   }
+  
 }

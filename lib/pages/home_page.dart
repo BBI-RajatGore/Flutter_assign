@@ -67,7 +67,7 @@ class _PostListScreenState extends State<PostListScreen> {
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.done) {
-            if (postProvider.posts.isEmpty) {
+            if (postProvider.allPost.isEmpty) {
               return const Center(
                 child: Text(
                   'No Posts Available.',
@@ -78,9 +78,9 @@ class _PostListScreenState extends State<PostListScreen> {
 
             return ListView.builder(
               padding: const EdgeInsets.all(8.0),
-              itemCount: postProvider.posts.length,
+              itemCount: postProvider.allPost.length,
               itemBuilder: (context, index) {
-                final post = postProvider.posts[index];
+                final post = postProvider.allPost[index];
                 return listViewWidget(post.id, post.title, post.body);
               },
             );
