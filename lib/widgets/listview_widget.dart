@@ -28,7 +28,7 @@ Widget listViewWidget(int id, String title, String subtitle) {
             id.toString(),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16, 
+              fontSize: 14, 
               color: Colors.orange,
             ),
           ),
