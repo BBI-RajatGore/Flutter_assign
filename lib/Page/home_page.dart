@@ -13,7 +13,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    
     final counterProvider = Provider.of<MyCounter>(context);
 
     return Scaffold(
@@ -35,9 +34,18 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ButtonWidget(function: () => counterProvider.decrementCounter(), text: "Decrement"),
-              ButtonWidget(function: () => counterProvider.resetCounter(), text: "Reset"),
-              ButtonWidget(function: () => counterProvider.incrementCounter(), text: "Increment"),
+              ButtonWidget(
+                function: () => counterProvider.decrementCounter(),
+                text: "Decrement",
+              ),
+              ButtonWidget(
+                function: () => counterProvider.resetCounter(),
+                text: "Reset",
+              ),
+              ButtonWidget(
+                function: () => counterProvider.incrementCounter(),
+                text: "Increment",
+              ),
             ],
           )
         ],
