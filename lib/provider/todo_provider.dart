@@ -4,8 +4,6 @@ import 'package:todo_list/models/todo_model.dart';
 class TodoProvider with ChangeNotifier {
   
   final List<Todo> _todoList = [];
-
-  //getter
   List<Todo> get todo => _todoList;
 
   bool addTodo(Todo todo) {
@@ -31,4 +29,13 @@ class TodoProvider with ChangeNotifier {
     _todoList.removeAt(index);
     notifyListeners();
   }
+
+  void updateTodo(int index,String title,String desc){
+
+    _todoList[index].title = title;
+    _todoList[index].description = desc;
+
+    notifyListeners();
+  }
+
 }
