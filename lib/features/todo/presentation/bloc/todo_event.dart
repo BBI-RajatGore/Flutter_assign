@@ -12,21 +12,15 @@ class TodoAdd extends TodoEvent {
 
 class FetchAllTodos extends TodoEvent {}
 
-class DeleteTodoById extends TodoEvent {
-
-  final int id;
-
-  DeleteTodoById(this.id);
-}
 
 class UpdateTodoById extends TodoEvent {
-  final int index;
-  final String newTitle;
-  final String newDescription;
+  final Todo todo;
 
-  UpdateTodoById({
-    required this.index,
-    required this.newTitle,
-    required this.newDescription,
-  });
+  UpdateTodoById({required this.todo});
+}
+
+class DeleteTodoById extends TodoEvent {
+  final int id;
+
+  DeleteTodoById({required this.id});
 }
