@@ -16,13 +16,13 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
   late TextEditingController titleController;
   late TextEditingController descriptionController;
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.todo?.title ?? '');
-    descriptionController = TextEditingController(text: widget.todo?.description ?? '');
+    descriptionController =
+        TextEditingController(text: widget.todo?.description ?? '');
   }
 
   @override
@@ -36,10 +36,6 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
-    setState(() {
-      _isLoading = true;
-    });
 
     final title = titleController.text;
     final description = descriptionController.text;
@@ -56,11 +52,6 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
       locator<TodoBloc>().add(UpdateTodoById(todo: newTodo));
     }
 
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-    });
-
     Navigator.of(context).pop();
   }
 
@@ -68,12 +59,15 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.todo == null ? 'Add Todo' : 'Edit Todo'),
+        title: Text(
+          widget.todo == null ? 'Add Todo' : 'Edit Todo',
+          style: const TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( 
+        child: SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
@@ -83,15 +77,15 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                   controller: titleController,
                   decoration: InputDecoration(
                     labelText: 'Title',
-                    labelStyle: const TextStyle(color: Colors.teal), // Label text color
+                    labelStyle: const TextStyle(color: Colors.teal),
                     hintText: 'Enter todo title',
                     hintStyle: TextStyle(color: Colors.grey[500]),
                     filled: true,
-                    fillColor: Colors.grey[200], // Background color of the input
+                    fillColor: Colors.grey[200],
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                        color: Colors.teal, 
+                        color: Colors.teal,
                         width: 2,
                       ),
                     ),
@@ -102,7 +96,8 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                         width: 2,
                       ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -112,8 +107,6 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                
-
                 TextFormField(
                   controller: descriptionController,
                   decoration: InputDecoration(
@@ -137,7 +130,8 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                         width: 2,
                       ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 18, horizontal: 16),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -147,22 +141,22 @@ class _AddEditTodoScreenState extends State<AddEditTodoScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                
-
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _saveTodo,
+                  onPressed: _saveTodo,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16), 
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12), 
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          widget.todo == null ? 'Add Todo' : 'Save Changes',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      widget.todo == null ? 'Add Todo' : 'Save Changes',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold,),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -4,7 +4,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_app_clean_archit/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:todo_app_clean_archit/features/todo/presentation/pages/add_edit_todo_screen.dart';
 
-
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
@@ -14,6 +13,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    context.read<TodoBloc>().add(FetchAllTodos());
   }
 
   @override
@@ -30,13 +30,23 @@ class _HomePageState extends State<HomePage> {
       ),
       body: BlocBuilder<TodoBloc, TodoState>(
         builder: (context, state) {
+
           if (state is TodoLoading) {
-            print("loadinggg.........");
+            print("TodLoading.......");
             return const Center(
               child: CircularProgressIndicator(),
             );
           } else if (state is TodoFetchSuccess) {
-            print("TodoSuccessState.......");
+            print("TodoFetchSuccess.........");
+
+            if (state.todos.isEmpty) {
+              return const Center(
+                child: Text(
+                  "No Todo Present",
+                  style: TextStyle(color: Colors.teal),
+                ),
+              );
+            }
             return SlidableAutoCloseBehavior(
               child: ListView.builder(
                 itemCount: state.todos.length,
@@ -50,7 +60,8 @@ class _HomePageState extends State<HomePage> {
                         SlidableAction(
                           padding: const EdgeInsets.all(10),
                           onPressed: (context) {
-                            context.read<TodoBloc>()
+                            context
+                                .read<TodoBloc>()
                                 .add(DeleteTodoById(id: todo.id));
                           },
                           icon: Icons.delete,

@@ -5,6 +5,7 @@ part 'todo.g.dart';
 
 @HiveType(typeId: 0) 
 class Todo extends Equatable {
+
   @HiveField(0)
   final int id;
 
@@ -35,5 +36,6 @@ class Todo extends Equatable {
 
   @override
   List<Object?> get props => [id, title, description];
+  
 }
 

@@ -25,26 +25,18 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
         _getAllTodo = getAllTodo,
         _deleteTodoById = deleteTodoById,
         _updateTodo = updateTodo,
-        super(TodoInitial()) {
+      super(TodoLoading()) {
 
+        on<TodoAdd>(_onTodoAdd);
+        on<FetchAllTodos>(_onFetchAllTodos);
+        on<DeleteTodoById>(_onDeleteTodo);
+        on<UpdateTodoById>(_onUpdateTodoById);
 
-
-      on<TodoAdd>(_onTodoAdd);
-      on<FetchAllTodos>(_onFetchAllTodos);
-      on<DeleteTodoById>(_onDeleteTodo);
-      on<UpdateTodoById>(_onUpdateTodoById);
-
-  }
-
-  // void addScreen(Todo todo) {
-  //   add(TodoAdd(todo: todo));
-  // }
+      }
 
   void _onTodoAdd(TodoAdd event, Emitter<TodoState> emit) async {
 
     emit(TodoLoading());
-
-    print("call in addtodo");
 
     final res = await _addTodo.call(event.todo);
 
@@ -62,8 +54,9 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
 
   void _onFetchAllTodos(FetchAllTodos event, Emitter<TodoState> emit) async {
 
-    print("featching doto....");
     emit(TodoLoading());
+
+    await Future.delayed(const Duration(seconds: 1),);
 
     final res = await _getAllTodo.call();
 
@@ -80,8 +73,6 @@ class TodoBloc extends Bloc<TodoEvent, TodoState> {
   }
 
 void _onDeleteTodo(DeleteTodoById event, Emitter<TodoState> emit) async {
-
-  print("deleteing todo called ${event.id}");
 
   emit(TodoLoading());
 
@@ -100,6 +91,7 @@ void _onDeleteTodo(DeleteTodoById event, Emitter<TodoState> emit) async {
 }
 
 void _onUpdateTodoById(UpdateTodoById event, Emitter<TodoState> emit) async {
+
   emit(TodoLoading());
 
   final updatedTodo = event.todo;

@@ -22,18 +22,9 @@ class MyApp extends StatelessWidget {
           getAllTodo: locator(),
           deleteTodoById: locator(),
           updateTodo: locator(),
-        )..add(FetchAllTodos()), 
-        child: BlocBuilder<TodoBloc, TodoState>(
-          builder: (context, state) {
-            if (state is TodoLoading) {
-              print("loading.................");
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is TodoFailure) {
-              return Center(child: Text('Error: ${state.message}'));
-            }
-            return HomePage();
-          },
-        ),
+        ), 
+
+        child: HomePage(),
       ),
     );
   }
