@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/provider/post_provider.dart';
+import 'package:weather_app/constants/app_constants.dart';
 import 'package:weather_app/utils/search.dart';
 import 'package:weather_app/utils/theme.dart';
-import 'package:weather_app/widgets/listview_widget.dart';
+import 'package:weather_app/widgets/custom_appbar_widget.dart';
+import 'package:weather_app/widgets/post_card_widget.dart';
 
 class PostListScreen extends StatefulWidget {
   const PostListScreen({super.key});
@@ -39,63 +41,38 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
 
-    final isDark = _isDarkMode;
-    final appBarColor = isDark ? Colors.grey : Colors.orange;
-    final backgroundColor = isDark ? Colors.black : Colors.white;
-    const textColor = Colors.white;
-    const iconColor = Colors.white;
-
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: appBarColor,
-        title: const Text(
-          'Posts',
-          style: TextStyle(color: textColor),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              isDark ? Icons.brightness_7 : Icons.brightness_2,
-              color: iconColor,
-            ),
-            onPressed: _toggle,
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.search,
-              color: iconColor,
-            ),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: PostSearchDelegate(
-                    postProvider: postProvider, isDark: _isDarkMode),
-              );
-            },
-          ),
-        ],
+      backgroundColor: _isDarkMode ? AppConstants.darkBackgroundColor : AppConstants.lightBackgroundColor,
+      appBar: CustomAppBar(
+        isDark: _isDarkMode,
+        toggleTheme: _toggle,
+        onSearch: () {
+          showSearch(
+            context: context,
+            delegate: PostSearchDelegate(postProvider: postProvider, isDark: _isDarkMode),
+          );
+        },
       ),
       body: FutureBuilder(
         future: _fetchPostsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return  Center(
-              child: CircularProgressIndicator(color: (_isDarkMode) ? Colors.white : Colors.black),
+            return Center(
+              child: CircularProgressIndicator(color: _isDarkMode ? Colors.white : Colors.black),
             );
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
                 'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
+                style: AppConstants.errorTextStyle,
               ),
             );
-          } else if (snapshot.connectionState == ConnectionState.done) {
+          } else {
             if (postProvider.allPost.isEmpty) {
               return const Center(
                 child: Text(
-                  'No Posts Available.',
-                  style: TextStyle(color: Colors.red),
+                  AppConstants.noPostsAvailableText,
+                  style: AppConstants.errorTextStyle,
                 ),
               );
             }
@@ -105,13 +82,10 @@ class _PostListScreenState extends State<PostListScreen> {
               itemCount: postProvider.allPost.length,
               itemBuilder: (context, index) {
                 final post = postProvider.allPost[index];
-                return listViewWidget(post.id, post.title, post.body, isDark);
+                return postCard(post.id, post.title, post.body, _isDarkMode);
               },
             );
           }
-          return const Center(
-            child: Text('Unexpected Error'),
-          );
         },
       ),
     );
