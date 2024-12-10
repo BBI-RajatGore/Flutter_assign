@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:news_app_clean_archi/domain/entities/news.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -7,11 +8,11 @@ abstract class NewsRemoteDataSource {
   Future<List<NewsArticle>> fetchNews({required int page, required int pageSize});
 }
 
-
-
 class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
   final String _baseUrl = 'https://newsapi.org/v2/everything';
-  final String _apiKey = '84df1f698ef1462b976f1926e67d88ed'; 
+  final String? _apiKey = dotenv.env['API_KEY']; 
+  
+
 
   @override
   Future<List<NewsArticle>> fetchNews({required int page, required int pageSize}) async {

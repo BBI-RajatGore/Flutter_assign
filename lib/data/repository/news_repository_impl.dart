@@ -5,6 +5,7 @@ import 'package:news_app_clean_archi/domain/entities/news.dart';
 import 'package:news_app_clean_archi/domain/repository/news_repository.dart';
 
 class NewsRepositoryImpl extends NewsRepository {
+  
   final NewsRemoteDataSource newsRemoteDataSource;
 
   NewsRepositoryImpl({required this.newsRemoteDataSource});
