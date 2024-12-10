@@ -1,8 +1,8 @@
-// lib/screens/edit_todo_page.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list/models/todo_model.dart';
 import 'package:todo_list/provider/todo_provider.dart';
+import 'package:todo_list/widgets/snackbar_widget.dart';
 
 class EditTodoPage extends StatefulWidget {
   final Todo todo;
@@ -81,9 +81,9 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 final String title = _titleController.text;
                 final String description = _descController.text;
                 if (title.isEmpty) {
-                  _showSnackBar(context, 'Title is Empty');
+                  ShowSnackBarWidget.showSnackBar(context, 'Title is Empty');
                 } else if (description.isEmpty) {
-                  _showSnackBar(context, 'Description is Empty');
+                  ShowSnackBarWidget.showSnackBar(context, 'Description is Empty');
                 } else {
                   Provider.of<TodoProvider>(context, listen: false)
                       .updateTodo(widget.index, title, description);
@@ -94,15 +94,6 @@ class _EditTodoPageState extends State<EditTodoPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
       ),
     );
   }

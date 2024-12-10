@@ -4,7 +4,17 @@ import 'package:todo_list/models/todo_model.dart';
 class TodoProvider with ChangeNotifier {
   
   final List<Todo> _todoList = [];
+  
   List<Todo> get todo => _todoList;
+
+  // TodoProvider(){
+  //   _loadTodo();
+
+  // }
+
+  // _loadTodo()
+  //_saveTodo()
+
 
   bool addTodo(Todo todo) {
     
@@ -15,6 +25,7 @@ class TodoProvider with ChangeNotifier {
     }
 
     _todoList.add(todo);
+    // _saveTodo();
     notifyListeners();
     return true;
      
@@ -22,11 +33,13 @@ class TodoProvider with ChangeNotifier {
 
   void toggleTodo(int index) {
     _todoList[index].isCompleted = !_todoList[index].isCompleted;
+    // _saveTodo();
     notifyListeners(); 
   }
 
   void deleteTodo(int index) {
     _todoList.removeAt(index);
+    // _saveTodo();
     notifyListeners();
   }
 
@@ -34,6 +47,8 @@ class TodoProvider with ChangeNotifier {
 
     _todoList[index].title = title;
     _todoList[index].description = desc;
+
+    // _saveTodo();
 
     notifyListeners();
   }
