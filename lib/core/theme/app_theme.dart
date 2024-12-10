@@ -36,7 +36,7 @@ class AppTheme {
     return ThemeData.dark().copyWith(
       scaffoldBackgroundColor: Colors.black87, 
       appBarTheme: const  AppBarTheme(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.purple,
         titleTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         iconTheme: IconThemeData(color: Colors.white), 
         elevation: 4,
