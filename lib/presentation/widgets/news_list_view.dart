@@ -5,10 +5,18 @@ import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
 import 'package:news_app_clean_archi/presentation/widgets/loading_widget.dart';
 import 'package:news_app_clean_archi/presentation/widgets/news_items_widget.dart';
 
-class NewsListView extends StatelessWidget {
+class NewsListView extends StatefulWidget {
   final ScrollController scrollController;
 
   const NewsListView({Key? key, required this.scrollController}) : super(key: key);
+
+  @override
+  _NewsListViewState createState() => _NewsListViewState();
+}
+
+class _NewsListViewState extends State<NewsListView> {
+
+  int? expandedIndex;  
 
   @override
   Widget build(BuildContext context) {
@@ -27,25 +35,31 @@ class NewsListView extends StatelessWidget {
     );
   }
 
-
   Widget _buildNewsList(List<NewsArticle> articles, BuildContext context, bool hasMore) {
     return RefreshIndicator(
       onRefresh: () async {
         context.read<NewsBloc>().add(FetchNewsEvent());
       },
       child: ListView.builder(
-        controller: scrollController,
+        controller: widget.scrollController,
         padding: const EdgeInsets.all(8.0),
-        itemCount: articles.length + (hasMore ? 1 : 0), 
+        itemCount: articles.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == articles.length) {
-            return LoadingWidget(); 
+            return const LoadingWidget(); 
           }
 
           final article = articles[index];
-          String imageUrl = article.urlToImage ?? '';
 
-          return NewsItemWidget(article: article);
+          return NewsItemWidget(
+            article: article,
+            isExpanded: expandedIndex == index,
+            onTap: () {
+              setState(() {
+                expandedIndex = expandedIndex == index ? null : index;  
+              });
+            },
+          );
         },
       ),
     );
