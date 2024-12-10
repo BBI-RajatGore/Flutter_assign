@@ -1,5 +1,9 @@
+// lib/validation_page.dart
+
 import 'package:flutter/material.dart';
-import 'package:form_validation/home_page.dart';
+import 'package:form_validation/pages/home_page.dart';
+import 'package:form_validation/utils/validation.dart';
+import 'package:form_validation/widgets/custom_text_form_field.dart';  // Import custom text form field widget
 
 class ValidationPage extends StatefulWidget {
   const ValidationPage({super.key});
@@ -9,63 +13,12 @@ class ValidationPage extends StatefulWidget {
 }
 
 class _ValidationPageState extends State<ValidationPage> {
-
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-
-  String? emailValidator(String? value) {
-
-    if (value == null || value.isEmpty) {
-      return 'Please enter an email';
-    }
-
-    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-
-    if (!regex.hasMatch(value)) {
-      return 'Please enter a valid email';
-    }
-
-    return null;
-  }
-
-  String? passwordValidator(String? value) {
-
-    if (value == null || value.isEmpty) {
-      return 'Please enter a password';
-    }
-
-    
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters long';
-    }
-
-    
-    if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return 'least one uppercase letter required';
-    }
-
-  
-    if (!RegExp(r'\d').hasMatch(value)) {
-      return 'least one digit required';
-    }
-
-    
-    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-      return 'least one special character required';
-    }
-
-    
-    if (value.contains(' ')) {
-      return 'Password cannot contain spaces';
-    }
-
-    return null;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +32,7 @@ class _ValidationPageState extends State<ValidationPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(30),
-            margin: const EdgeInsets.symmetric(
-              horizontal: 50,
-            ),
+            margin: const EdgeInsets.symmetric(horizontal: 50),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
@@ -99,44 +50,36 @@ class _ValidationPageState extends State<ValidationPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextFormField(
+                  CustomTextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter Email',
-                      border: OutlineInputBorder(),
-                    ),
+                    labelText: 'Enter Email',
+                    obscureText: false,
                     validator: emailValidator,
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  CustomTextFormField(
                     controller: _passwordController,
+                    labelText: 'Enter Password',
                     obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Password',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      ),
-                    ),
                     validator: passwordValidator,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
-
-                        //saving the current state
                         _formKey.currentState!.save();
-
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                             builder: (context) => HomePage(
