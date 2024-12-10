@@ -7,6 +7,7 @@ Future<void> showTodoDialog(
   BuildContext context, {
   Todo? todo,
 }) async {
+  
   final titleController = TextEditingController(text: todo?.title ?? '');
   final descriptionController = TextEditingController(text: todo?.description ?? '');
   
@@ -33,7 +34,7 @@ Future<void> showTodoDialog(
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
+              Navigator.of(context).pop(); 
             },
             child: const Text('Cancel'),
           ),
@@ -44,15 +45,13 @@ Future<void> showTodoDialog(
 
               if (title.isNotEmpty && description.isNotEmpty) {
                 if (todo == null) {
-                  // Add a new Todo
                   final newTodo = Todo(
-                    id: DateTime.now().millisecondsSinceEpoch, // Generate a new ID
+                    id: DateTime.now().millisecondsSinceEpoch, 
                     title: title,
                     description: description,
                   );
-                  locator<TodoBloc>().add(TodoAdd(todo: newTodo)); // Dispatch Add Todo event
+                  locator<TodoBloc>().add(TodoAdd(todo: newTodo)); 
                 } else {
-                  // Edit existing Todo
                   final updatedTodo = todo.copyWith(
                     title: title,
                     description: description,
