@@ -65,7 +65,7 @@ class NewsItemWidget extends StatelessWidget {
             trailing: AnimatedRotation(
               turns: isExpanded ? 0.5 : 0.0, 
               duration: const Duration(milliseconds: 300),
-              child: const Icon(Icons.arrow_downward),
+              child: const Icon(Icons.arrow_drop_down),
             ),
           ),
         ],

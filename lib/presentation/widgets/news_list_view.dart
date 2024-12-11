@@ -45,11 +45,16 @@ class _NewsListViewState extends State<NewsListView> {
         padding: const EdgeInsets.all(8.0),
         itemCount: articles.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
+          
           if (index == articles.length) {
             return const LoadingWidget(); 
           }
 
           final article = articles[index];
+          
+          if(article.title=="[Removed]" && article.description=="[Removed]"){
+            return Container() ;
+          }
 
           return NewsItemWidget(
             article: article,

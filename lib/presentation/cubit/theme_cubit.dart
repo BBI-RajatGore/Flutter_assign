@@ -1,8 +1,6 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:news_app_clean_archi/core/theme/theme_manager.dart';
 
-part 'theme_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app_clean_archi/core/theme/theme_manager.dart';
 
 
 class ThemeCubit extends Cubit<bool> {
@@ -19,5 +17,6 @@ class ThemeCubit extends Cubit<bool> {
     final isDarkMode = await ThemeManager.loadTheme();
     emit(isDarkMode);
   }
+
 }
 

@@ -5,7 +5,7 @@ class AppTheme {
   static ThemeData lightTheme() {
 
     return ThemeData.light().copyWith(
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: const Color.fromARGB(255, 255, 253, 250),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.orange,
         titleTextStyle: TextStyle(
@@ -34,7 +34,7 @@ class AppTheme {
   static ThemeData darkTheme() {
 
     return ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Colors.black87, 
+      scaffoldBackgroundColor: Colors.black, 
       appBarTheme: const  AppBarTheme(
         backgroundColor: Colors.purple,
         titleTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),

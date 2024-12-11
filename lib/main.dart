@@ -12,10 +12,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: "lib/.env");
-  
+
   initServiceLocator();
 
-  // Load saved theme first 
+  // Load saved theme first
   final themeCubit = getIt<ThemeCubit>();
   await themeCubit.loadTheme();
 
@@ -23,7 +23,9 @@ void main() async {
     MultiBlocProvider(
       providers: [
         BlocProvider<ThemeCubit>(create: (_) => themeCubit),
-        BlocProvider<NewsBloc>(create: (_) => getIt<NewsBloc>(),),
+        BlocProvider<NewsBloc>(
+          create: (_) => getIt<NewsBloc>(),
+        ),
       ],
       child: MyApp(),
     ),
@@ -45,4 +47,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

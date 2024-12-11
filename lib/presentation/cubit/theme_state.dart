@@ -1,10 +1,10 @@
-part of 'theme_cubit.dart';
+// part of 'theme_cubit.dart';
 
-sealed class ThemeState extends Equatable {
-  const ThemeState();
+// sealed class ThemeState extends Equatable {
+//   const ThemeState();
 
-  @override
-  List<Object> get props => [];
-}
+//   @override
+//   List<Object> get props => [];
+// }
 
-final class ThemeInitial extends ThemeState {}
+// final class ThemeInitial extends ThemeState {}
