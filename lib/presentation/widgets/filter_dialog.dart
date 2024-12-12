@@ -3,13 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
 
 class FilterDialog extends StatefulWidget {
-
+  
+  final String? selectedSortBy;
+  final String? selectedLanguage;
+  final String? searchQuery;
   final Function(String?) onSortByChanged;
   final Function(String?) onLanguageChanged;
   final Function(String?) onSearchQueryChanged;
 
   const FilterDialog({
-    super.key, 
+    super.key,
+    required this.selectedLanguage,
+    required this.searchQuery,
+    required this.selectedSortBy,
     required this.onSortByChanged,
     required this.onLanguageChanged,
     required this.onSearchQueryChanged,
@@ -20,10 +26,18 @@ class FilterDialog extends StatefulWidget {
 }
 
 class _FilterDialogState extends State<FilterDialog> {
-  
-  String? _selectedSortBy = 'publishedAt';
-  String? _selectedLanguage = 'en';
+
+  String? _selectedSortBy;
+  String? _selectedLanguage;
   final TextEditingController _searchQuery = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedSortBy = widget.selectedSortBy;
+    _selectedLanguage = widget.selectedLanguage;
+    _searchQuery.text = widget.searchQuery ?? ''; 
+  }
 
   @override
   void dispose() {
@@ -59,11 +73,12 @@ class _FilterDialogState extends State<FilterDialog> {
                 labelText: 'Search Query (q)',
                 hintText: 'Enter keywords or phrases',
               ),
-              onChanged: (value){
-                widget.onSearchQueryChanged(value);
+              onChanged: (value) {
+                widget.onSearchQueryChanged(value.isNotEmpty ? value : 'latest');
               },
             ),
             const SizedBox(height: 20),
+            
             DropdownButton<String>(
               isExpanded: true,
               value: _selectedLanguage,
@@ -82,6 +97,7 @@ class _FilterDialogState extends State<FilterDialog> {
               hint: const Text('Select Language'),
             ),
             const SizedBox(height: 20),
+            
             DropdownButton<String>(
               isExpanded: true,
               value: _selectedSortBy,
@@ -114,7 +130,7 @@ class _FilterDialogState extends State<FilterDialog> {
           onPressed: () {
             context.read<NewsBloc>().add(
                   FetchNewsEvent(
-                    query: _searchQuery.text.trim(),
+                    query: _searchQuery.text.trim().isNotEmpty ? _searchQuery.text.trim() : 'latest',
                     sortBy: _selectedSortBy,
                     language: _selectedLanguage,
                   ),
