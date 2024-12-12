@@ -45,13 +45,20 @@ class _NewsListViewState extends State<NewsListView> {
         padding: const EdgeInsets.all(8.0),
         itemCount: articles.length + (hasMore ? 1 : 0),
         itemBuilder: (context, index) {
-          
+
+          if(articles.isEmpty){
+
+            return const Center(
+              child: Text("No News for applied Filters",style: TextStyle(color: Colors.red),),
+            );
+          }
+
           if (index == articles.length) {
             return const LoadingWidget(); 
           }
 
           final article = articles[index];
-          
+
           if(article.title=="[Removed]" && article.description=="[Removed]"){
             return Container() ;
           }
@@ -65,6 +72,7 @@ class _NewsListViewState extends State<NewsListView> {
               });
             },
           );
+          
         },
       ),
     );
