@@ -7,6 +7,7 @@ import 'package:news_app_clean_archi/presentation/widgets/loading_widget.dart';
 import 'package:news_app_clean_archi/presentation/widgets/news_items_widget.dart';
 
 class NewsListView extends StatefulWidget {
+  
   final ScrollController scrollController;
 
   const NewsListView({Key? key, required this.scrollController}) : super(key: key);
@@ -68,7 +69,7 @@ class _NewsListViewState extends State<NewsListView> {
           final article = articles[index];
 
 
-          if (article.title == "[Removed]" && article.description == "[Removed]") {
+          if(article.title == "[Removed]" && article.description == "[Removed]") {
             return Container();
           }
 

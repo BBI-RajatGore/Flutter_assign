@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 abstract class NewsRemoteDataSource {
+
   Future<List<NewsArticle>> fetchNews({
     required String? query,
     required String? language,
@@ -11,9 +12,16 @@ abstract class NewsRemoteDataSource {
     required int page,
     required int pageSize,
   });
+
 }
 
 class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
+
+  final http.Client client;
+
+  NewsRemoteDataSourceImpl({required this.client});
+
+
   final String _baseUrl = 'https://newsapi.org/v2/everything';
   final String? _apiKey = dotenv.env['API_KEY'];
 
@@ -36,7 +44,7 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
     print(url);
 
     try {
-      final response = await http.get(url);
+      final response = await client.get(url);
 
       if (response.statusCode == 200) {
 

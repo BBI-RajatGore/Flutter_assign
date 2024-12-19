@@ -11,12 +11,13 @@ class NewsScreen extends StatefulWidget {
 }
 
 class _NewsScreenState extends State<NewsScreen> {
+
   final ScrollController _scrollController = ScrollController();
 
   String? _selectedSortBy = 'publishedAt';
   String? _selectedLanguage = 'en';
   String? _searchQuery = "latest";
-  bool _isFabVisible = true;
+  bool _isFabVisible = false;
 
   @override
   void initState() {
@@ -31,11 +32,11 @@ class _NewsScreenState extends State<NewsScreen> {
         );
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels > 100 && !_isFabVisible) {
+      if (_scrollController.position.pixels > 100 && _isFabVisible) {
         setState(() {
           _isFabVisible = true;
         });
-      } else if (_scrollController.position.pixels <= 100 && _isFabVisible) {
+      } else if (_scrollController.position.pixels <= 100 && !_isFabVisible) {
         setState(() {
           _isFabVisible = false;
         });
@@ -51,7 +52,6 @@ class _NewsScreenState extends State<NewsScreen> {
               ),
             );
       }
-      
     });
   }
 
@@ -143,3 +143,4 @@ class _NewsScreenState extends State<NewsScreen> {
     );
   }
 }
+

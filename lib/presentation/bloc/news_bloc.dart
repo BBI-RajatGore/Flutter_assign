@@ -9,6 +9,7 @@ part 'news_state.dart';
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
 
   final FetchNews _fetchNews;
+  
   int _page = 1;
   static const int _pageSize = 20;
   static const int _maxPages = 5;

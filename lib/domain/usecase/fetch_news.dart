@@ -4,7 +4,8 @@ import 'package:news_app_clean_archi/core/error/failure.dart';
 import 'package:news_app_clean_archi/domain/entities/news.dart';
 import 'package:news_app_clean_archi/domain/repository/news_repository.dart';
 
-class FetchNews {
+class FetchNews  {
+
   final NewsRepository newsRepository;
 
   FetchNews({required this.newsRepository});
@@ -19,4 +20,5 @@ class FetchNews {
       pageSize: pageSize,
     );
   }
+
 }
