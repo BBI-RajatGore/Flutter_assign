@@ -14,7 +14,7 @@ class ThemeCubit extends Cubit<bool> {
   }
 
   Future<void> loadTheme() async {
-    final isDarkMode = await themeManager.loadTheme();
+    final isDarkMode = await themeManager.getTheme();
     emit(isDarkMode);
   }
 }
