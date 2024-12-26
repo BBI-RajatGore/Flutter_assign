@@ -1,170 +1,112 @@
+
+
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:news_app_clean_archi/domain/entities/news.dart';
 import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
 import 'package:news_app_clean_archi/presentation/cubit/theme_cubit.dart';
 import 'package:news_app_clean_archi/presentation/pages/news_screen.dart';
-import 'package:news_app_clean_archi/service_locator.dart';
+import 'package:news_app_clean_archi/presentation/widgets/loading_widget.dart';
+
+class MockNewsBloc extends Mock implements NewsBloc {}
+
+class MockThemeCubit extends Mock implements ThemeCubit {}
 
 void main() {
 
-  setUpAll(() async {
-    await dotenv.load(fileName: ".env");
-    initServiceLocator();
+  late MockNewsBloc mockNewsBloc;
+  late MockThemeCubit mockThemeCubit;
+
+  setUp(() {
+    mockNewsBloc = MockNewsBloc();
+    mockThemeCubit = MockThemeCubit();
   });
 
-  testWidgets("testing icon button ", (WidgetTester tester) async {
-    
-    // when(() => getIt.state).thenReturn(false); // Light mode
-    // when(() => mockThemeCubit.toggleTheme()).thenAnswer((_) async {});
-
-    await tester.pumpWidget(MaterialApp(
+  Widget createWidgetUnderTest() {
+    return MaterialApp(
       home: MultiBlocProvider(
         providers: [
-          BlocProvider<ThemeCubit>(
-            create: (_) => getIt<ThemeCubit>(),
-          ),
-          BlocProvider<NewsBloc>(
-            create: (_) => getIt<NewsBloc>(),
-          ),
+          BlocProvider<NewsBloc>.value(value: mockNewsBloc),
+          BlocProvider<ThemeCubit>.value(value: mockThemeCubit),
         ],
         child: NewsScreen(),
       ),
-    ));
+    );
+  }
 
-    
+  group('NewsScreen Widget Tests', () {
+    testWidgets('should display LoadingWidget when state is NewsLoadingState',
+        (WidgetTester tester) async {
+      // Arrange
+      when(() => mockNewsBloc.state).thenReturn(NewsLoadingState());
 
-    final text = find.text('News App');
+      await tester.pumpWidget(createWidgetUnderTest());
 
-    expect(text, findsOneWidget);
+      // Assert
+      expect(find.byType(LoadingWidget), findsOneWidget);
+    });
 
-    final icon = find.byIcon( Icons.nightlight_round);
+    testWidgets(
+        'should display a list of news articles when state is NewsLoadedState',
+        (WidgetTester tester) async {
 
-    expect(icon, findsOneWidget);
+      final articles = [
+        NewsArticle(
+          title: 'Test News 1',
+          description: 'Description 1',
+          urlToImage: 'https://example.com/image1.jpg', publishedAt: '1/22/2023',
+          
+        ),
+        NewsArticle(
+          title: 'Test News 2',
+          description: 'Description 2',
+          urlToImage: 'https://example.com/image2.jpg',publishedAt: '1/22/2023',
+        ),
+      ];
 
-    await tester.tap(icon);
+      when(() => mockNewsBloc.state).thenReturn(NewsLoadedState(
+        articles: articles,
+        hasMore: false,
+      ));
 
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump();
 
+      // Assert
+      expect(find.text('Test News 1'), findsOneWidget);
+      expect(find.text('Description 1'), findsOneWidget);
+      expect(find.text('Test News 2'), findsOneWidget);
+      expect(find.text('Description 2'), findsOneWidget);
 
-    final icon2 = find.byIcon(Icons.wb_sunny);
+    });
 
-    expect(icon2, findsNothing );
+    testWidgets('should display error message when state is NewsErrorState',
+        (WidgetTester tester) async {
+      // Arrange
+      when(() => mockNewsBloc.state).thenReturn(NewsErrorState('Error loading news'));
 
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Assert
+      expect(find.text('Error loading news'), findsOneWidget);
+    });
+
+    testWidgets('should display empty message when no articles are available',
+        (WidgetTester tester) async {
+      // Arrange
+      when(() => mockNewsBloc.state).thenReturn(NewsLoadedState(
+        articles: [],
+        hasMore: false,
+      ));
+
+      await tester.pumpWidget(createWidgetUnderTest());
+
+      // Assert
+      expect(find.text('No News for applied Filters'), findsOneWidget);
+    });
   });
 }
-
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:mocktail/mocktail.dart';
-// import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
-// import 'package:news_app_clean_archi/presentation/cubit/theme_cubit.dart';
-// import 'package:news_app_clean_archi/presentation/pages/news_screen.dart';
-// import 'package:news_app_clean_archi/service_locator.dart';
-// import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-// // Mock the ThemeCubit to simulate theme switching
-// class MockThemeCubit extends Mock implements ThemeCubit {}
-
-// class MockNewsBloc extends Mock implements NewsBloc {}
-
-// void main() {
-
-//   TestWidgetsFlutterBinding.ensureInitialized();
-
-//   late MockThemeCubit mockThemeCubit;
-//   late MockNewsBloc mockNewsBloc;
-
-//   setUpAll(() async {
-
-//     await dotenv.load(fileName: ".env");
-
-//     // Initialize GetIt and register only if NewsBloc is not already registered
-//     initServiceLocator();
-
-//     mockThemeCubit = MockThemeCubit();
-//     mockNewsBloc = MockNewsBloc();
-
-//     // Register them only if they are not already registered
-//     if (!getIt.isRegistered<NewsBloc>()) {
-//       getIt.registerSingleton<NewsBloc>(mockNewsBloc);
-//     }
-
-//     if (!getIt.isRegistered<ThemeCubit>()) {
-//       getIt.registerSingleton<ThemeCubit>(mockThemeCubit);
-//     }
-
-//   });
-
-//   setUp(() {
-//     // Reset mocks before each test
-//     reset(mockThemeCubit);
-//     reset(mockNewsBloc);
-//   });
-
-//   // Helper function to create the widget under test
-//   Widget createWidgetUnderTest() {
-//     return MaterialApp(
-//       home: MultiBlocProvider(
-//         providers: [
-//           BlocProvider<ThemeCubit>(
-//             create: (_) => mockThemeCubit,
-//           ),
-//           BlocProvider<NewsBloc>(
-//             create: (_) => getIt<NewsBloc>(),
-//           ),
-//         ],
-//         child: NewsScreen(),
-//       ),
-//     );
-//   }
-
-//   group('NewsScreen Tests', () {
-//     testWidgets("theme icon button toggles the theme", (WidgetTester tester) async {
-
-//       // Initially set the theme state to light mode (false)
-//       when(() => mockThemeCubit.state).thenReturn(false);
-
-//       // when(() => mockThemeCubit.stream).thenAnswer((_) => Stream.value(false));
-
-//       // Build the widget under test
-//       await tester.pumpWidget(createWidgetUnderTest());
-
-//       // Find the theme toggle icon (nightlight_round for light mode)
-//       final initialIcon = find.byIcon(Icons.nightlight_round);
-//       expect(initialIcon, findsOneWidget);
-
-//       // Simulate tapping the icon to toggle the theme
-//       await tester.tap(initialIcon);
-//       await tester.pumpAndSettle();  // Wait for UI to settle
-
-//       // After the toggle, verify that the icon changes to wb_sunny (dark mode)
-//       when(() => mockThemeCubit.state).thenReturn(true);
-//       when(() => mockThemeCubit.stream).thenAnswer((_) => Stream.value(true));
-      
-//       await tester.pumpAndSettle(); // Wait for the widget tree to rebuild
-//       final toggledIcon = find.byIcon(Icons.wb_sunny);
-//       expect(toggledIcon, findsOneWidget);
-
-//       // Now simulate toggling back to light mode
-//       await tester.tap(toggledIcon);
-//       await tester.pumpAndSettle();
-
-//       // Verify the icon changes back to nightlight_round (light mode)
-//       when(() => mockThemeCubit.state).thenReturn(false);
-//       when(() => mockThemeCubit.stream).thenAnswer((_) => Stream.value(false));
-//       await tester.pumpAndSettle();
-//       final backToLightIcon = find.byIcon(Icons.nightlight_round);
-//       expect(backToLightIcon, findsOneWidget);
-//     });
-    
-//   });
-// }
-
-
-
-

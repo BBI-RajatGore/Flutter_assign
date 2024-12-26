@@ -6,14 +6,16 @@ import 'package:news_app_clean_archi/presentation/widgets/filter_dialog.dart';
 import 'package:news_app_clean_archi/presentation/widgets/news_list_view.dart';
 
 class NewsScreen extends StatefulWidget {
+
   @override
   _NewsScreenState createState() => _NewsScreenState();
+
 }
 
 class _NewsScreenState extends State<NewsScreen> {
 
   final ScrollController _scrollController = ScrollController();
-
+  
   String? _selectedSortBy = 'publishedAt';
   String? _selectedLanguage = 'en';
   String? _searchQuery = "latest";

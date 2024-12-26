@@ -9,6 +9,7 @@ import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
 class MockFetchNews extends Mock implements FetchNews {}
 
 void main() {
+  
   late NewsBloc newsBloc;
   late FetchNews mockFetchNews;
 
@@ -200,3 +201,226 @@ void main() {
   });
 
 }
+
+
+// import 'package:bloc_test/bloc_test.dart';
+// import 'package:flutter_test/flutter_test.dart';
+// import 'package:mocktail/mocktail.dart';
+// import 'package:news_app_clean_archi/core/error/failure.dart';
+// import 'package:news_app_clean_archi/domain/entities/news.dart';
+// import 'package:news_app_clean_archi/domain/usecase/fetch_news.dart';
+// import 'package:fpdart/fpdart.dart';
+// import 'package:news_app_clean_archi/presentation/bloc/news_bloc.dart';
+
+// class MockFetchNews extends Mock implements FetchNews {}
+
+// void main() {
+//   late NewsBloc newsBloc;
+//   late MockFetchNews mockFetchNews;
+
+//   const String query = 'flutter';
+//   const String language = 'en';
+//   const String sortBy = 'publishedAt';
+//   const int page = 1;
+//   const int pageSize = 20;
+
+//   setUp(() {
+//     mockFetchNews = MockFetchNews();
+//     newsBloc = NewsBloc(fetchNews: mockFetchNews);
+//   });
+
+//   tearDown(() {
+//     newsBloc.close();
+//   });
+
+//   group('NewsBloc', () {
+//     test('initial state is NewsInitialState', () {
+//       expect(newsBloc.state, equals(NewsInitialState()));
+//     });
+
+//     blocTest<NewsBloc, NewsState>(
+//       'emits [NewsLoadingState, NewsLoadedState] when fetch news succeeds',
+//       build: () {
+//         final mockNews = [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ];
+//         when(() => mockFetchNews.call(query, language, sortBy, page, pageSize))
+//             .thenAnswer((_) async => Right(mockNews));
+//         return newsBloc;
+//       },
+//       act: (bloc) => bloc.add(FetchNewsEvent(
+//         query: query,
+//         language: language,
+//         sortBy: sortBy,
+//       )),
+//       expect: () => [
+//         NewsLoadingState(),
+//         NewsLoadedState(articles: [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ], hasMore: false),
+//       ],
+//       verify: (_) {
+//         verify(() => mockFetchNews.call(query, language, sortBy, page, pageSize)).called(1);
+//       },
+//     );
+
+//     blocTest<NewsBloc, NewsState>(
+//       'emits [NewsLoadingState, NewsErrorState] when fetch news fails',
+//       build: () {
+//         when(() => mockFetchNews.call(query, language, sortBy, page, pageSize))
+//             .thenAnswer((_) async => Left(Failure('Failed to load news')));
+//         return newsBloc;
+//       },
+//       act: (bloc) => bloc.add(FetchNewsEvent(
+//         query: query,
+//         language: language,
+//         sortBy: sortBy,
+//       )),
+//       expect: () => [
+//         NewsLoadingState(),
+//         NewsErrorState('Failed to load news'),
+//       ],
+//       verify: (_) {
+//         verify(() => mockFetchNews.call(query, language, sortBy, page, pageSize)).called(1);
+//       },
+//     );
+
+//     blocTest<NewsBloc, NewsState>(
+//       'emits [NewsLoadingState, NewsErrorState] when an unexpected error occurs',
+//       build: () {
+//         when(() => mockFetchNews.call(query, language, sortBy, page, pageSize))
+//             .thenThrow(Exception());
+//         return newsBloc;
+//       },
+//       act: (bloc) => bloc.add(FetchNewsEvent(
+//         query: query,
+//         language: language,
+//         sortBy: sortBy,
+//       )),
+//       expect: () => [
+//         NewsLoadingState(),
+//         NewsErrorState('An unexpected error occured'),
+//       ],
+//     );
+
+//     blocTest<NewsBloc, NewsState>(
+//       'emits [NewsLoadingState, NewsLoadedState] when load more news is successful',
+//       build: () {
+//         final mockNews = [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ];
+//         final newMockNews = [
+//           NewsArticle(
+//             title: 'Dart 2.13 released',
+//             description: 'The latest version of Dart.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-02',
+//           ),
+//         ];
+//         when(() => mockFetchNews.call(query, language, sortBy, page, pageSize))
+//             .thenAnswer((_) async => Right(mockNews));
+//         when(() => mockFetchNews.call(query, language, sortBy, 2, pageSize))
+//             .thenAnswer((_) async => Right(newMockNews));
+//         return newsBloc;
+//       },
+//       act: (bloc) async {
+//         bloc.add(FetchNewsEvent(
+//           query: query,
+//           language: language,
+//           sortBy: sortBy,
+//         ));
+//         await Future.delayed(Duration.zero);
+//         bloc.add(LoadMoreNewsEvent(
+//           query: query,
+//           language: language,
+//           sortBy: sortBy,
+//         ));
+//       },
+//       expect: () => [
+//         NewsLoadingState(),
+//         NewsLoadedState(articles: [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ], hasMore: true),
+//         NewsLoadedState(articles: [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//           NewsArticle(
+//             title: 'Dart 2.13 released',
+//             description: 'The latest version of Dart.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-02',
+//           ),
+//         ], hasMore: false),
+//       ],
+//       verify: (_) {
+//         verify(() => mockFetchNews.call(query, language, sortBy, page, pageSize)).called(1);
+//         verify(() => mockFetchNews.call(query, language, sortBy, 2, pageSize)).called(1);
+//       },
+//     );
+
+//     blocTest<NewsBloc, NewsState>(
+//       'does not emit NewsLoadedState if there is no more news to load',
+//       build: () {
+//         final mockNews = [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ];
+//         when(() => mockFetchNews.call(query, language, sortBy, page, pageSize))
+//             .thenAnswer((_) async => Right(mockNews));
+//         return newsBloc;
+//       },
+//       act: (bloc) async {
+//         bloc.add(FetchNewsEvent(
+//           query: query,
+//           language: language,
+//           sortBy: sortBy,
+//         ));
+//         await Future.delayed(Duration.zero);
+//         bloc.add(LoadMoreNewsEvent(
+//           query: query,
+//           language: language,
+//           sortBy: sortBy,
+//         ));
+//       },
+//       expect: () => [
+//         NewsLoadingState(),
+//         NewsLoadedState(articles: [
+//           NewsArticle(
+//             title: 'Flutter 3.0 released',
+//             description: 'The latest version of Flutter.',
+//             urlToImage: 'https://image.url',
+//             publishedAt: '2021-01-01',
+//           ),
+//         ], hasMore: false),
+//       ],
+//     );
+//   });
+// }

@@ -32,7 +32,9 @@ void main() {
   });
 
   testWidgets('displays list of news when state is loaded', (WidgetTester tester) async {
+
     final articles = [NewsArticle(title: "Test News", description: "Description",urlToImage: 'urlToImage', publishedAt: '1/2/3123')];
+    
     when(mockNewsBloc.state).thenReturn(NewsLoadedState(articles: articles, hasMore: true));
 
     await tester.pumpWidget(
