@@ -3,6 +3,9 @@ import 'package:task_manager/features/auth/data/datasource/auth_remote_data_sour
 import 'package:task_manager/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:task_manager/features/auth/domain/repositories/auth_repository.dart';
 import 'package:task_manager/features/auth/domain/usecase/create_user.dart';
+import 'package:task_manager/features/auth/domain/usecase/get_user_status.dart';
+import 'package:task_manager/features/auth/domain/usecase/login_user.dart';
+import 'package:task_manager/features/auth/domain/usecase/logout_user.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:task_manager/features/task/data/datasource/remote_data_source.dart';
 import 'package:task_manager/features/task/data/reposotory/repository_impl.dart';
@@ -57,6 +60,8 @@ void init() {
     ),
   );
 
+
+
   // auth
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(),
@@ -74,9 +79,30 @@ void init() {
     ),
   );
 
+  sl.registerLazySingleton<LoginUser>(
+    () => LoginUser(
+      authRepository: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetUserStatus>(
+    () => GetUserStatus(
+      authRepository: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton<LogoutUser>(
+    () => LogoutUser(
+      authRepository: sl(),
+    ),
+  );
+
   sl.registerFactory(
     () => AuthBloc(
       createUser: sl(),
+      loginUser: sl(),
+      getUserStatus: sl(),
+      logoutUser: sl()
     ),
   );
 }

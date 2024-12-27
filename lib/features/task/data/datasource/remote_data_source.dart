@@ -33,14 +33,25 @@ class RemoteDataSourceImpl extends RemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, void>> deleteTask(String userId, String taskId) {
-    throw UnimplementedError();
+  Future<Either<Failure, void>> deleteTask(String userId, String taskId) async {
+    try {
+      await _taskRef.child(userId).child(taskId).remove();
+      return const Right(null);
+    }
+    catch(e){
+      return Left(Failure('Failed to delete task: $e'));
+    }
   }
 
   @override
   Future<Either<Failure, void>> editTask(
-      String userId, String taskId, UserTask task) {
-    throw UnimplementedError();
+      String userId, String taskId, UserTask task) async {
+    try {
+      await _taskRef.child(userId).child(taskId).update(task.toJson());
+      return const Right(null);
+    } catch (error) {
+      return Left(Failure('Failed to edit task: $error'));
+    }
   }
 
   @override
@@ -59,12 +70,12 @@ class RemoteDataSourceImpl extends RemoteDataSource {
           tasks.add(UserTask.fromJson(taskData, taskId));
         });
 
-        tasks.sort((a, b) => b.dueDate.compareTo(a.dueDate));
+        // tasks.sort((a, b) => b.dueDate.compareTo(a.dueDate));
 
         return Right(tasks);
 
       } else {
-        return Left(Failure("Now task found"));
+        return Left(Failure("No Task Found"));
       }
     } catch (error) {
       return Left(Failure('Failed to load tasks: $error'));
