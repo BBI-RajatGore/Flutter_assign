@@ -1,23 +1,24 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
+
+  final SharedPreferences sharedPreferences;
+
+  SharedPreferencesHelper({required this.sharedPreferences});
   
-  static const String _userIdKey = 'userId';
+ final String _userIdKey = 'userId';
   
-  static Future<void> saveUserId(String userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userIdKey, userId);
+  Future<void> saveUserId(String userId) async {
+    await sharedPreferences.setString(_userIdKey, userId);
   }
 
 
-  static Future<String?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userIdKey);
+   Future<String?> getUserId() async {
+    return sharedPreferences.getString(_userIdKey);
   }
 
 
-  static Future<void> removeUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_userIdKey);
+   Future<void> removeUserId() async {
+    await sharedPreferences.remove(_userIdKey);
   }
 }

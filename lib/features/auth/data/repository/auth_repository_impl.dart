@@ -6,8 +6,9 @@ import 'package:task_manager/features/auth/domain/repositories/auth_repository.d
 
 class AuthRepositoryImpl extends AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
+  final SharedPreferencesHelper sharedPreferencesHelper;
 
-  AuthRepositoryImpl({required this.authRemoteDataSource});
+  AuthRepositoryImpl({required this.authRemoteDataSource,required this.sharedPreferencesHelper});
 
   @override
   Future<Either<Failure, String>> createUser() async {
@@ -21,7 +22,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Either<Failure, String>> getUserStatus() async {
-    final userId = await SharedPreferencesHelper.getUserId();
+    final userId = await sharedPreferencesHelper.getUserId();
     if (userId != null) {
       return Right(userId);
     } else {
@@ -32,7 +33,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Either<Failure, void>> logoutUser() async {
     try{
-      await SharedPreferencesHelper.removeUserId();
+      await sharedPreferencesHelper.removeUserId();
       return const  Right(null);
     }
     catch(e){

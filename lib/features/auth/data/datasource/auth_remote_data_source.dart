@@ -1,5 +1,6 @@
 
 
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:task_manager/core/error/failure.dart';
@@ -11,27 +12,31 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
-  
-  final DatabaseReference _userCounterRef = FirebaseDatabase.instance.ref('user_count');
-  final DatabaseReference _usersRef = FirebaseDatabase.instance.ref('users');
+  final SharedPreferencesHelper sharedPreferencesHelper;
+  final DatabaseReference userCounterRef;
+  final DatabaseReference usersRef;
 
+  AuthRemoteDataSourceImpl({required this.sharedPreferencesHelper,required this.userCounterRef,required this.usersRef});
+  
   @override
   Future<Either<Failure, String>> createUser() async {
     try {
-      final snapshot = await _userCounterRef.get();
+      final snapshot = await userCounterRef.get();
+      print(snapshot);
       final currentUserId = snapshot.exists && snapshot.value != null
           ? (snapshot.value as int)
           : 0;
+      print(currentUserId);
 
       final newUserId = 'user_${currentUserId + 1}';
-      await _userCounterRef.set(currentUserId + 1);
+      await userCounterRef.set(currentUserId + 1);
       
 
-      await _usersRef.child(newUserId).set({
+      await usersRef.child(newUserId).set({
         'userId': newUserId,
       });
 
-      await SharedPreferencesHelper.saveUserId(newUserId);  
+      await sharedPreferencesHelper.saveUserId(newUserId);  
 
       return Right(newUserId);
     } catch (error) {
@@ -42,10 +47,10 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
   @override
   Future<Either<Failure, String>> loginUser(String userId) async {
     try {
-      final snapshot = await _usersRef.child(userId).get();
+      final snapshot = await usersRef.child(userId).get();
 
       if (snapshot.exists) {
-        await SharedPreferencesHelper.saveUserId(userId);  
+        await sharedPreferencesHelper.saveUserId(userId);  
         return Right(userId); 
       } else {
         return Left(Failure('User not registered'));
@@ -55,3 +60,4 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
     }
   }
 }
+

@@ -85,12 +85,11 @@ import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
 import 'package:task_manager/features/task/domain/entities/usertask.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
+  
   final FetchTask fetchTasks;
   final AddTask addTask;
   final EditTask editTask;
   final DeleteTask deleteTask;
-
-  final DatabaseReference _taskRef = FirebaseDatabase.instance.ref('tasks');
 
   List<UserTask> _sortedTasks = [];
 

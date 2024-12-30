@@ -1,16 +1,13 @@
-// enum Priority {
-//   low,
-//   medium,
-//   high,
-// }
 
+
+import 'package:task_manager/features/task/domain/entities/priority.dart';
 
 class UserTask {
   final String id;
   final String title;
   final String description;
   final DateTime dueDate;
-  final String priority;  
+  final Priority priority;  
 
   UserTask({
     required this.id,
@@ -27,29 +24,28 @@ class UserTask {
       title: map['title'],
       description: map['description'],
       dueDate: DateTime.parse(map['dueDate']),
-      // priority: _priorityFromString(map['priority']),
-      priority: map['priority'],
+      priority: _priorityFromString(map['priority']), 
     );
   }
 
   // Convert enum to string for storage in Firestore or other databases
-  // static String _priorityToString(Priority priority) {
-  //   return priority.toString().split('.').last;
-  // }
+  static String _priorityToString(Priority priority) {
+    return priority.toString().split('.').last;
+  }
 
   // Convert string to enum for reading from Firestore or other databases
-  // static Priority _priorityFromString(String priority) {
-  //   switch (priority) {
-  //     case 'low':
-  //       return Priority.low;
-  //     case 'medium':
-  //       return Priority.medium;
-  //     case 'high':
-  //       return Priority.high;
-  //     default:
-  //       throw ArgumentError('Invalid priority value');
-  //   }
-  // }
+  static Priority _priorityFromString(String priority) {
+    switch (priority) {
+      case 'low':
+        return Priority.low;
+      case 'medium':
+        return Priority.medium;
+      case 'high':
+        return Priority.high;
+      default:
+        throw ArgumentError('Invalid priority value');
+    }
+  }
 
   // Method to convert UserTask to map, for saving in Firestore
   Map<String, dynamic> toJson() {
@@ -57,8 +53,7 @@ class UserTask {
       'title': title,
       'description': description,
       'dueDate': dueDate.toIso8601String(),
-      // 'priority': _priorityToString(priority),
-      'priority': priority,
+      'priority': _priorityToString(priority),  // Storing as string
     };
   }
 
@@ -68,7 +63,7 @@ class UserTask {
     String? title,
     String? description,
     DateTime? dueDate,
-    String? priority,
+    Priority? priority,
   }) {
     return UserTask(
       id: id ?? this.id,
@@ -79,3 +74,6 @@ class UserTask {
     );
   }
 }
+
+
+

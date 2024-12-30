@@ -1,238 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:task_manager/features/task/domain/entities/usertask.dart';
-// import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
-// import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
-// import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
-
-// class AddTaskScreen extends StatefulWidget {
-//   final String userId;
-//   final UserTask? task;
-
-//   AddTaskScreen({required this.userId, this.task});
-
-//   @override
-//   _AddTaskScreenState createState() => _AddTaskScreenState();
-// }
-
-// class _AddTaskScreenState extends State<AddTaskScreen> {
-//   final TextEditingController _titleController = TextEditingController();
-//   final TextEditingController _descriptionController = TextEditingController();
-//   DateTime _dueDate = DateTime.now();
-//   String _priority = 'High';
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     if (widget.task != null) {
-//       _titleController.text = widget.task!.title;
-//       _descriptionController.text = widget.task!.description;
-//       _dueDate = widget.task!.dueDate;
-//       _priority = widget.task!.priority;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(widget.task == null ? "Add Task" : "Edit Task"),
-//       ),
-//       body: Padding(
-//         padding: EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: _titleController,
-//               decoration: InputDecoration(labelText: "Task Title"),
-//             ),
-//             TextField(
-//               controller: _descriptionController,
-//               decoration: InputDecoration(labelText: "Task Description"),
-//             ),
-//             ListTile(
-//               title: Text("Due Date: ${_dueDate.toLocal()}"),
-//               onTap: () async {
-//                 final pickedDate = await showDatePicker(
-//                   context: context,
-//                   initialDate: _dueDate,
-//                   firstDate: DateTime(2000),
-//                   lastDate: DateTime(2100),
-//                 );
-//                 if (pickedDate != null && pickedDate != _dueDate) {
-//                   setState(() {
-//                     _dueDate = pickedDate;
-//                   });
-//                 }
-//               },
-//             ),
-//             DropdownButton<String>(
-//               value: _priority,
-//               onChanged: (value) {
-//                 setState(() {
-//                   _priority = value!;
-//                 });
-//               },
-//               items: ['High', 'Medium', 'Low'].map((String priority) {
-//                 return DropdownMenuItem<String>(
-//                   value: priority,
-//                   child: Text(priority),
-//                 );
-//               }).toList(),
-//             ),
-//             const SizedBox(height: 16),
-//             ElevatedButton(
-//               onPressed: () {
-//                 if (widget.task == null) {
-//                   final task = UserTask(
-//                     id: '',
-//                     title: _titleController.text,
-//                     description: _descriptionController.text,
-//                     dueDate: _dueDate,
-//                     priority: _priority,
-//                   );
-//                   context.read<TaskBloc>().add(AddTaskEvent(userId: widget.userId, task: task));
-//                 } else {
-//                   final updatedTask = widget.task!.copyWith(
-//                     title: _titleController.text,
-//                     description: _descriptionController.text,
-//                     dueDate: _dueDate,
-//                     priority: _priority,
-//                   );
-//                   context.read<TaskBloc>().add(EditTaskEvent(userId: widget.userId, taskId: widget.task!.id, task: updatedTask));
-//                 }
-//                 Navigator.pop(context);
-//               },
-//               child: Text(widget.task == null ? "Add Task" : "Save Changes"),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:task_manager/features/task/domain/entities/usertask.dart';
-// import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
-// import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
-
-// class AddTaskScreen extends StatefulWidget {
-//   final String userId;
-//   final UserTask? task;
-
-//   AddTaskScreen({required this.userId, this.task});
-
-//   @override
-//   _AddTaskScreenState createState() => _AddTaskScreenState();
-// }
-
-// class _AddTaskScreenState extends State<AddTaskScreen> {
-//   final TextEditingController _titleController = TextEditingController();
-//   final TextEditingController _descriptionController = TextEditingController();
-//   DateTime _dueDate = DateTime.now();
-//   String _priority = 'High';
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     if (widget.task != null) {
-//       _titleController.text = widget.task!.title;
-//       _descriptionController.text = widget.task!.description;
-//       _dueDate = widget.task!.dueDate;
-//       _priority = widget.task!.priority;
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(widget.task == null ? "Add Task" : "Edit Task"),
-//       ),
-//       body: Padding(
-//         padding: EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: _titleController,
-//               decoration: InputDecoration(labelText: "Task Title"),
-//             ),
-//             TextField(
-//               controller: _descriptionController,
-//               decoration: InputDecoration(labelText: "Task Description"),
-//             ),
-//             ListTile(
-//               title: Text("Due Date: ${_dueDate.toLocal()}"),
-//               onTap: () async {
-//                 final pickedDate = await showDatePicker(
-//                   context: context,
-//                   initialDate: _dueDate,
-//                   firstDate: DateTime(2000),
-//                   lastDate: DateTime(2100),
-//                 );
-//                 if (pickedDate != null && pickedDate != _dueDate) {
-//                   setState(() {
-//                     _dueDate = pickedDate;
-//                   });
-//                 }
-//               },
-//             ),
-//             DropdownButton<String>(
-//               value: _priority,
-//               onChanged: (value) {
-//                 setState(() {
-//                   _priority = value!;
-//                 });
-//               },
-//               items: ['High', 'Medium', 'Low'].map((String priority) {
-//                 return DropdownMenuItem<String>(
-//                   value: priority,
-//                   child: Text(priority),
-//                 );
-//               }).toList(),
-//             ),
-//             const SizedBox(height: 16),
-//             ElevatedButton(
-//               onPressed: () {
-//                 if (widget.task == null) {
-//                   final task = UserTask(
-//                     id: '',
-//                     title: _titleController.text,
-//                     description: _descriptionController.text,
-//                     dueDate: _dueDate,
-//                     priority: _priority,
-//                   );
-//                   context.read<TaskBloc>().add(AddTaskEvent(userId: widget.userId, task: task));
-//                 } else {
-//                   final updatedTask = widget.task!.copyWith(
-//                     title: _titleController.text,
-//                     description: _descriptionController.text,
-//                     dueDate: _dueDate,
-//                     priority: _priority,
-//                   );
-//                   context.read<TaskBloc>().add(EditTaskEvent(userId: widget.userId, taskId: widget.task!.id, task: updatedTask));
-//                 }
-//                 Navigator.pop(context);
-//               },
-//               child: Text(widget.task == null ? "Add Task" : "Save Changes"),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_manager/features/task/domain/entities/usertask.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
+import 'package:task_manager/features/task/domain/entities/priority.dart';
 
 class AddTaskScreen extends StatefulWidget {
   final String userId;
@@ -248,7 +19,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   DateTime _dueDate = DateTime.now();
-  String _priority = 'High';
+  Priority _priority = Priority.high;  // Default priority set to high
 
   @override
   void initState() {
@@ -257,15 +28,16 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       _titleController.text = widget.task!.title;
       _descriptionController.text = widget.task!.description;
       _dueDate = widget.task!.dueDate;
-      _priority = widget.task!.priority;
+      _priority = widget.task!.priority;  // Set the priority from the task
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.task == null ? "Add Task" : "Edit Task",style: const TextStyle(color: Colors.white),),
+        title: Text(widget.task == null ? "Add Task" : "Edit Task", style: const TextStyle(color: Colors.white)),
         elevation: 0,
         backgroundColor: Colors.deepPurple,
       ),
@@ -278,7 +50,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               // Title Input
               TextField(
                 controller: _titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Task Title",
                   labelStyle: TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(),
@@ -293,7 +65,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               // Description Input
               TextField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Task Description",
                   labelStyle: TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(),
@@ -309,7 +81,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               // Due Date Picker
               ListTile(
                 title: Text(
-                  "Due Date: ${_dueDate.toLocal().toString().split(' ')[0]}",
+                  "Due Date: $_dueDate",  // Use the formatted date
                   style: TextStyle(fontSize: 16),
                 ),
                 trailing: Icon(Icons.calendar_today, color: Colors.deepPurple),
@@ -329,24 +101,24 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Priority Dropdown
-              DropdownButtonFormField<String>(
+              // Priority Dropdown (Enum Handling)
+              DropdownButtonFormField<Priority>(
                 value: _priority,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Priority',
                   labelStyle: TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                 ),
-                onChanged: (value) {
+                onChanged: (Priority? newPriority) {
                   setState(() {
-                    _priority = value!;
+                    _priority = newPriority!;
                   });
                 },
-                items: ['High', 'Medium', 'Low'].map((String priority) {
-                  return DropdownMenuItem<String>(
+                items: Priority.values.map((Priority priority) {
+                  return DropdownMenuItem<Priority>(
                     value: priority,
-                    child: Text(priority),
+                    child: Text(priority.toString().split('.').last.capitalize()),
                   );
                 }).toList(),
               ),
@@ -356,14 +128,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
+                    final task = UserTask(
+                      id: widget.task?.id ?? '',
+                      title: _titleController.text,
+                      description: _descriptionController.text,
+                      dueDate: _dueDate,  // Pass the DateTime object directly
+                      priority: _priority,
+                    );
+
                     if (widget.task == null) {
-                      final task = UserTask(
-                        id: '',
-                        title: _titleController.text,
-                        description: _descriptionController.text,
-                        dueDate: _dueDate,
-                        priority: _priority,
-                      );
                       context.read<TaskBloc>().add(AddTaskEvent(userId: widget.userId, task: task));
                     } else {
                       final updatedTask = widget.task!.copyWith(
@@ -377,15 +150,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    // primary: Colors.blueAccent,
                   ),
                   child: Text(
                     widget.task == null ? "Add Task" : "Save Changes",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -396,3 +168,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 }
+
+extension StringCasingExtension on String {
+  String capitalize() {
+    if (this == null || this.isEmpty) {
+      return this;
+    }
+    return '${this[0].toUpperCase()}${this.substring(1)}';
+  }
+}
+
+

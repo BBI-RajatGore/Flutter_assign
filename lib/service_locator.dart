@@ -1,4 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager/features/auth/data/datasource/auth_local_data_source.dart';
 import 'package:task_manager/features/auth/data/datasource/auth_remote_data_source.dart';
 import 'package:task_manager/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:task_manager/features/auth/domain/repositories/auth_repository.dart';
@@ -18,10 +21,12 @@ import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
 
 final sl = GetIt.instance;
 
-void init() {
+Future<void> init() async {
   // task
   sl.registerLazySingleton<RemoteDataSource>(
-    () => RemoteDataSourceImpl(),
+    () => RemoteDataSourceImpl(
+      taskRef: FirebaseDatabase.instance.ref('tasks')
+    ),
   );
 
   sl.registerLazySingleton<TaskRepository>(
@@ -60,17 +65,25 @@ void init() {
     ),
   );
 
-
-
   // auth
+
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  sl.registerLazySingleton<SharedPreferencesHelper>(
+    () => SharedPreferencesHelper(sharedPreferences: sharedPreferences),
+  );
+
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+    () => AuthRemoteDataSourceImpl(
+      sharedPreferencesHelper: sl(),
+      userCounterRef: FirebaseDatabase.instance.ref('user_count'),
+      usersRef: FirebaseDatabase.instance.ref('users'),
+    ),
   );
 
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-      authRemoteDataSource: sl(),
-    ),
+        authRemoteDataSource: sl(), sharedPreferencesHelper: sl()),
   );
 
   sl.registerLazySingleton<CreateUser>(
@@ -99,10 +112,9 @@ void init() {
 
   sl.registerFactory(
     () => AuthBloc(
-      createUser: sl(),
-      loginUser: sl(),
-      getUserStatus: sl(),
-      logoutUser: sl()
-    ),
+        createUser: sl(),
+        loginUser: sl(),
+        getUserStatus: sl(),
+        logoutUser: sl()),
   );
 }
