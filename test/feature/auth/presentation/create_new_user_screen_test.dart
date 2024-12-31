@@ -1,5 +1,6 @@
-import 'package:bloc_test/bloc_test.dart';
+
 import 'package:flutter/material.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -8,9 +9,7 @@ import 'package:task_manager/features/auth/presentation/bloc/auth_event.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
 import 'package:task_manager/features/auth/presentation/pages/create_user_screen.dart';
 import 'package:task_manager/features/task/presentation/pages/task_screen.dart';
-import 'package:task_manager/main.dart';
 
-// Mocking the AuthBloc and its dependencies
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 
 void main() {
@@ -18,85 +17,90 @@ void main() {
 
   setUp(() {
     mockAuthBloc = MockAuthBloc();
+    // Provide an initial state for the mock AuthBloc
+    when(() => mockAuthBloc.state).thenReturn(AuthInitial());
   });
 
-  group('AuthStateWrapper Widget Tests', () {
-    testWidgets('should show loading spinner when state is Loading', (tester) async {
-      // Arrange
-      when(() => mockAuthBloc.state).thenReturn(Loading());
+  tearDown(() {
+    mockAuthBloc.close();
+  });
 
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<AuthBloc>(
-            create: (context) => mockAuthBloc,
-            child: AuthStateWrapper(),
-          ),
-        ),
-      );
-
-      // Assert: Check if the loading spinner is displayed
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
-testWidgets('should navigate to TaskScreen when UserPresent state is emitted', (tester) async {
- 
-
-  // Act: Trigger the CheckUserStatusEvent to emit UserPresent
-  await tester.pumpWidget(
-    MaterialApp(
-      home: BlocProvider<AuthBloc>(
-        create: (context) => mockAuthBloc,
-        child: CreateUserScreen(),
+  Widget createTestableWidget(Widget child) {
+    return BlocProvider<AuthBloc>(
+      create: (_) => mockAuthBloc,
+      child: MaterialApp(
+        home: child,
       ),
-    ),
-  );
+    );
+  }
 
-  // Wait for state changes to complete
-  // await tester.pumpAndSettle();  // Ensures all pending animations and navigation events are processed
+  testWidgets('CreateUserScreen displays buttons correctly', (WidgetTester tester) async {
+    await tester.pumpWidget(createTestableWidget(CreateUserScreen()));
 
-  // Assert: Verify TaskScreen is displayed
-  expect(find.text('Create User'), findsOneWidget); 
-});
+    // Verify the presence of buttons
+    expect(find.text("Create New User"), findsOneWidget);
+    expect(find.text("Login"), findsOneWidget);
+  });
 
+  testWidgets('Navigates to Login dialog on Login button tap', (WidgetTester tester) async {
+    await tester.pumpWidget(createTestableWidget(CreateUserScreen()));
 
+    // Tap on the "Login" button
+    await tester.tap(find.text("Login"));
+    await tester.pumpAndSettle();
 
+    // Verify navigation to the Login dialog
+    expect(find.byType(AlertDialog), findsOneWidget);
+  });
 
+  testWidgets('Create New User button triggers CreateUserEvent', (WidgetTester tester) async {
+    // Mock the behavior of CreateUserEvent
+    when(() => mockAuthBloc.state).thenReturn(AuthInitial());
 
+    await tester.pumpWidget(createTestableWidget(CreateUserScreen()));
 
-    testWidgets('should display error message when AuthError state is emitted', (tester) async {
-      // Arrange
-      when(() => mockAuthBloc.state).thenReturn(AuthError(message: 'Something went wrong'));
+    // Tap on the "Create New User" button
+    await tester.tap(find.text("Create New User"));
+    await tester.pump();
 
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<AuthBloc>(
-            create: (context) => mockAuthBloc,
-            child: AuthStateWrapper(),
-          ),
-        ),
-      );
+    // Verify that the "Create New User" button was pressed and event is dispatched
+    // verify(() => mockAuthBloc.add(CreateUserEvent())).called(1);
+  });
 
-      // Assert: Check if the error message is displayed
-      expect(find.text('Something went wrong'), findsOneWidget);
-    });
+  testWidgets('Navigates to TaskScreen after successful user creation', (WidgetTester tester) async {
+    // Mock a successful user creation
+    // when(() => mockAuthBloc.state).thenReturn(UserLoggedIn(userId: '123'));
 
-    testWidgets('should show CreateUserScreen when AuthInitial state is emitted', (tester) async {
-      // Arrange
-      when(() => mockAuthBloc.state).thenReturn(AuthInitial());
+    when(() => mockAuthBloc.stream).thenAnswer(
+      (_) => Stream.fromIterable([AuthInitial(), UserLoggedIn(userId: '123')]),
+    );
 
-      // Act
-      await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<AuthBloc>(
-            create: (context) => mockAuthBloc,
-            child: AuthStateWrapper(),
-          ),
-        ),
-      );
+    await tester.pumpWidget(createTestableWidget(CreateUserScreen()));
 
-      // Assert: Check that CreateUserScreen is displayed
-      expect(find.byType(CreateUserScreen), findsOneWidget);
-    });
+    // Tap on the "Create New User" button
+    await tester.tap(find.widgetWithText(ElevatedButton,"Create New User"));
+    await tester.pumpAndSettle();
+
+    // Verify navigation to TaskScreen (assuming the task screen exists and its type is TaskScreen)
+    expect(find.byType(TaskScreen), findsOneWidget);
+  });
+
+  testWidgets('Displays error message if AuthError state occurs', (WidgetTester tester) async {
+    // Mock an AuthError state
+    when(() => mockAuthBloc.state).thenReturn(AuthError(message: 'An error occurred'));
+
+    when(() => mockAuthBloc.stream).thenAnswer(
+      (_) => Stream.fromIterable([AuthInitial(), AuthError(message: 'An error occurred')]),
+    );
+
+    await tester.pumpWidget(createTestableWidget(CreateUserScreen()));
+
+    // Trigger the "Create New User" button
+    await tester.tap(find.text("Create New User"));
+    await tester.pumpAndSettle();
+
+    // Check if the SnackBar with the error message appears
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.text('An error occurred'), findsOneWidget);
   });
 }

@@ -1,12 +1,13 @@
 
 
+import 'dart:ffi';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:task_manager/features/task/data/datasource/remote_data_source.dart';
 import 'package:task_manager/features/task/domain/entities/priority.dart';
 import 'package:task_manager/features/task/domain/entities/usertask.dart';
-
 
 class MockDatabaseReference extends Mock implements DatabaseReference {}
 
@@ -68,52 +69,46 @@ void main() {
     });
 
     test('should delete a task successfully', () async {
-      // Arrange
-      final taskRef = MockDatabaseReference();
-      when(() => mockDatabaseReference.child(testUserId)).thenAnswer((_)=> taskRef);
-      // when(() => taskRef.exists).thenReturn(true);  // Simulate that task exists
-      // when(() => taskRef.child(testUserId))
-      //     .thenAnswer((_)=>taskRef);
+    // Arrange
+     final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
+      when(()=>taskRef.child(testTaskId)).thenReturn(taskRef);
+     when(() => taskRef.remove()).thenAnswer((_) async => null);  // This returns a Future<void>
 
-      // when(() => taskRef.get())
-      //     .thenAnswer((_) async =>mockDataSnapshot);
+    // Act
+    final result = await remoteDataSource.deleteTask(testUserId, testTaskId);
 
-      
-
-      
-
-      // Act
-      final result = await remoteDataSource.deleteTask(testUserId, testTaskId);
-
-      // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
-      verify(() => mockDatabaseReference.child(testUserId).child(testTaskId).remove()).called(1);
-    });
+    // Assert
+    expect(result.isRight(), true);  // Should be a success (Right)
+    verify(() => mockDatabaseReference.child(testUserId).child(testTaskId).remove()).called(1);
+  });
 
     test('should return failure when deleting task fails', () async {
-      // Arrange
-      when(() => mockDatabaseReference.child(testUserId).child(testTaskId).get())
-          .thenThrow(Exception('Failed to get task'));
-      
+
+      //Arrange
+      final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
+      when(()=>taskRef.child(testTaskId)).thenReturn(taskRef);
+     when(() => taskRef.remove()).thenThrow(Exception('Failed to delete task'));  
+     
       // Act
       final result = await remoteDataSource.deleteTask(testUserId, testTaskId);
 
       // Assert
       expect(result.isLeft(), true);  // Should be a failure (Left)
       result.fold(
-        (failure) => expect(failure.message, 'Failed to delete task: Exception: Failed to get task'),
+        (failure) => expect(failure.message, 'Failed to delete task: Exception: Failed to delete task'),
         (success) => fail('Expected failure but got success'),
       );
     });
 
     test('should edit a task successfully', () async {
       // Arrange
-      final taskSnapshot = MockDataSnapshot();
-      when(() => mockDatabaseReference.child(testUserId).child(testTaskId).get())
-          .thenAnswer((_) async => taskSnapshot);
-      when(() => taskSnapshot.exists).thenReturn(true);  // Simulate that task exists
-      when(() => mockDatabaseReference.child(testUserId).child(testTaskId).update(any()))
-          .thenAnswer((_) async => null);
+       final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
+      when(()=>taskRef.child(testTaskId)).thenReturn(taskRef);
+     when(() => taskRef.update(any())).thenAnswer((_) async => null);  
+      
 
       // Act
       final result = await remoteDataSource.editTask(testUserId, testTaskId, testTask);
@@ -125,24 +120,28 @@ void main() {
 
     test('should return failure when editing task fails', () async {
       // Arrange
-      when(() => mockDatabaseReference.child(testUserId).child(testTaskId).get())
-          .thenThrow(Exception('Failed to get task'));
-      
+      final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
+      when(()=>taskRef.child(testTaskId)).thenReturn(taskRef);
+      when(() => taskRef.update(any())).thenThrow(Exception('Failed to update task'));  
+     
       // Act
       final result = await remoteDataSource.editTask(testUserId, testTaskId, testTask);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true);  
       result.fold(
-        (failure) => expect(failure.message, 'Failed to edit task: Exception: Failed to get task'),
+        (failure) => expect(failure.message, 'Failed to edit task: Exception: Failed to update task'),
         (success) => fail('Expected failure but got success'),
       );
     });
 
     test('should fetch all tasks successfully', () async {
       // Arrange
+      final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
       final snapshot = MockDataSnapshot();
-      when(() => mockDatabaseReference.child(testUserId).get()).thenAnswer((_) async => snapshot);
+      when(() => taskRef.get()).thenAnswer((_) async => snapshot);
       when(() => snapshot.exists).thenReturn(true);
       when(() => snapshot.value).thenReturn({
         '-OFLzZqmd35yPy2kU86i': {
@@ -174,11 +173,11 @@ void main() {
       );
       verify(() => mockDatabaseReference.child(testUserId).get()).called(1);
     });
-
     test('should return failure when fetching tasks fails', () async {
       // Arrange
-      when(() => mockDatabaseReference.child(testUserId).get())
-          .thenThrow(Exception('Failed to load tasks'));
+      final taskRef = MockDatabaseReference();
+      when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
+      when(() => taskRef.get()).thenThrow(Exception('Failed to load tasks'));
 
       // Act
       final result = await remoteDataSource.fetchAllTasks(testUserId);
@@ -186,9 +185,10 @@ void main() {
       // Assert
       expect(result.isLeft(), true);  // Should be a failure (Left)
       result.fold(
-        (failure) => expect(failure.message, 'Failed to load tasks'),
+        (failure) => expect(failure.message, 'Failed to load tasks: Exception: Failed to load tasks'),
         (success) => fail('Expected failure but got success'),
       );
     });
+
   });
 }

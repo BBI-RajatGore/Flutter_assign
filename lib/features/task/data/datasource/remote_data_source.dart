@@ -21,7 +21,7 @@ class RemoteDataSourceImpl extends RemoteDataSource {
   Future<Either<Failure, void>> addTask(UserTask task, String userId) async {
     try {
       final taskRefe = taskRef.child(userId).push();
-      await taskRefe.set(task.toJson()); // Save task data under the new ID
+      await taskRefe.set(task.toJson()); 
       return const Right(null);
     } catch (error) {
       return Left(Failure("Failed to add task"));
@@ -31,15 +31,8 @@ class RemoteDataSourceImpl extends RemoteDataSource {
   @override
   Future<Either<Failure, void>> deleteTask(String userId, String taskId) async {
     try {
-      // Check if the task exists before attempting to delete it
-      final taskSnapshot = await taskRef.child(userId).child(taskId).get();
-      print("here");
-      if (!taskSnapshot.exists) {
-        return Left(Failure('Task not found'));
-      }
-
-      // If task exists, delete it
-      await taskRef.child(userId).child(taskId).remove();
+      final taskRefe = taskRef.child(userId).child(taskId);
+      await taskRefe.remove();
       return const Right(null);
     } catch (e) {
       return Left(Failure('Failed to delete task: $e'));
@@ -49,14 +42,8 @@ class RemoteDataSourceImpl extends RemoteDataSource {
   @override
   Future<Either<Failure, void>> editTask(String userId, String taskId, UserTask task) async {
     try {
-      // Check if the task exists before attempting to update it
-      final taskSnapshot = await taskRef.child(userId).child(taskId).get();
-      if (!taskSnapshot.exists) {
-        return Left(Failure('Task not found'));
-      }
-
-      // If task exists, update it
-      await taskRef.child(userId).child(taskId).update(task.toJson());
+      final taskRefe =  taskRef.child(userId).child(taskId);
+      await taskRefe.update(task.toJson());
       return const Right(null);
     } catch (error) {
       return Left(Failure('Failed to edit task: $error'));

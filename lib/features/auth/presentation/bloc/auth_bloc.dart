@@ -72,10 +72,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogoutUser(LogoutUserEvent event,Emitter<AuthState> emit)async{
 
-    emit(Loading());
-
-    await logoutUser.call();
-
-    emit(UserLoggedOut());
+    print("Logging out...");
+  emit(Loading());
+  await logoutUser.call();
+  print("UserLoggedOut state emitted");
+  emit(UserLoggedOut());
   }
 }
