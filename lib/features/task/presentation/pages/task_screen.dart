@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_event.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
@@ -8,8 +9,6 @@ import 'package:task_manager/features/task/domain/entities/usertask.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
-import 'package:task_manager/features/task/presentation/pages/add_task_scree.dart';
-import 'package:task_manager/features/auth/presentation/pages/create_user_screen.dart';
 
 class TaskScreen extends StatefulWidget {
   final String userId;
@@ -22,6 +21,7 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
+
   String? _selectedPriority;
   String? _selectedDueDate;
   int? _expandedTaskIndex;
@@ -29,36 +29,81 @@ class _TaskScreenState extends State<TaskScreen> {
   @override
   void initState() {
     super.initState();
+    _loadFilters();
     context.read<TaskBloc>().add(FetchTasksEvent(userId: widget.userId));
+  }
+
+  Future<void> _loadFilters() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedPriority = prefs.getString('filter_priority') ?? 'all';
+      bool isDesc = prefs.getBool('filter_is_desc') ?? false;
+      if(isDesc){
+        _selectedDueDate = "Desc";
+      }
+      else{
+        _selectedDueDate="Asc";
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    print("task screen called");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.deepPurple,
-        title: Text("Welcome ${widget.userId}",
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text(
+          "Welcome ${widget.userId}",
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 15,
+          ),
+        ),
         actions: [
+          _buildStyledDropdown(
+            value: _selectedPriority,
+            hintText: "Priority",
+            items: ['high', 'medium', 'low', 'all'],
+            onChanged: (newValue) {
+              setState(() {
+                _selectedPriority = newValue;
+              });
+              context.read<TaskBloc>().add(FilterTasksEvent(
+                    userId: widget.userId,
+                    priority: _selectedPriority,
+                    isDesc: _selectedDueDate == 'Desc',
+                  ));
+            },
+          ),
+          _buildStyledDropdown(
+            value: _selectedDueDate,
+            hintText: "Due Date",
+            items: ['Desc', 'Asc'],
+            onChanged: (newValue) {
+              setState(() {
+                _selectedDueDate = newValue;
+              });
+              context.read<TaskBloc>().add(FilterTasksEvent(
+                    userId: widget.userId,
+                    priority: _selectedPriority,
+                    isDesc: _selectedDueDate == 'Desc',
+                  ));
+            },
+          ),
           BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is UserLoggedOut) {
-                print('User has logged out');
-                Navigator.pushReplacement(
+                Navigator.pushReplacementNamed(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => CreateUserScreen(),
-                  ),
+                  '/createUserScreen',
                 );
               }
             },
             builder: (context, state) {
               return IconButton(
                 onPressed: () {
-                  print("cliecjedddd");
                   context.read<AuthBloc>().add(LogoutUserEvent());
                 },
                 icon: const Icon(Icons.logout, color: Colors.white),
@@ -69,64 +114,6 @@ class _TaskScreenState extends State<TaskScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                DropdownButton<String>(
-                  value: _selectedPriority,
-                  hint: const Text("Priority"),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedPriority = newValue;
-                    });
-                    context.read<TaskBloc>().add(FilterTasksEvent(
-                          userId: widget.userId,
-                          priority: _selectedPriority,
-                        ));
-                  },
-                  items: ['high', 'medium', 'low', 'all']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(width: 20),
-                DropdownButton<String>(
-                  value: _selectedDueDate,
-                  hint: const Text("Due Date"),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedDueDate = newValue;
-                    });
-
-                    bool? isDesc;
-                    if (newValue == 'Desc') {
-                      isDesc = true;
-                    } else if (newValue == 'Asc') {
-                      isDesc = false;
-                    }
-
-                    context.read<TaskBloc>().add(FilterTasksEvent(
-                          userId: widget.userId,
-                          priority: _selectedPriority,
-                          isDesc: isDesc,
-                        ));
-                  },
-                  items: ['Desc', 'Asc']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
           Expanded(
             child: BlocBuilder<TaskBloc, TaskState>(
               builder: (context, state) {
@@ -153,23 +140,19 @@ class _TaskScreenState extends State<TaskScreen> {
                           isExpanded: _expandedTaskIndex == index,
                           onTap: () {
                             setState(() {
-                              // Toggle the task's expanded state
                               _expandedTaskIndex =
                                   _expandedTaskIndex == index ? null : index;
                             });
                           },
                           onEdit: () {
-                            Navigator.push(
+                            Navigator.pushNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => AddTaskScreen(
-                                    userId: widget.userId, task: task),
-                              ),
-                            ).then((_) {
-                              context
-                                  .read<TaskBloc>()
-                                  .add(FetchTasksEvent(userId: widget.userId));
-                            });
+                              '/addTaskScreen',
+                              arguments: {
+                                'userId': widget.userId,
+                                'task': task
+                              },
+                            );
                           },
                           onDelete: () {
                             context.read<TaskBloc>().add(DeleteTaskEvent(
@@ -201,16 +184,11 @@ class _TaskScreenState extends State<TaskScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(
-              builder: (_) => AddTaskScreen(userId: widget.userId),
-            ),
-          ).then((_) {
-            context
-                .read<TaskBloc>()
-                .add(FetchTasksEvent(userId: widget.userId));
-          });
+            '/addTaskScreen',
+            arguments: {'userId': widget.userId, 'task': null},
+          );
         },
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.add, size: 30, color: Colors.white),
@@ -229,6 +207,52 @@ class _TaskScreenState extends State<TaskScreen> {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildStyledDropdown({
+    required String? value,
+    required String hintText,
+    required List<String> items,
+    required Function(String?) onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.deepPurple, width: 1),
+      ),
+      child: DropdownButton<String>(
+        value: value,
+        hint: Text(
+          hintText,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        dropdownColor: Colors.deepPurple,
+        icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 24),
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          );
+        }).toList(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+        ),
+        underline: SizedBox(),
+      ),
+    );
   }
 }
 

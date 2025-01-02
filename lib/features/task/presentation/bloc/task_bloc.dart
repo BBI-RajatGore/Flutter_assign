@@ -1,5 +1,6 @@
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_manager/core/utils/shared_preference_filter.dart';
 import 'package:task_manager/features/task/domain/usecases/add_task.dart';
 import 'package:task_manager/features/task/domain/usecases/delete_task.dart';
 import 'package:task_manager/features/task/domain/usecases/edit_task.dart';
@@ -9,6 +10,7 @@ import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
 import 'package:task_manager/features/task/domain/entities/usertask.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
+
   final FetchTask fetchTasks;
   final AddTask addTask;
   final EditTask editTask;
@@ -29,16 +31,8 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<FilterTasksEvent>(_onFilterTasks);
   }
 
-  // Sort tasks by due date
-  List<UserTask> _sortTasksByDueDate(List<UserTask> tasks) {
-    tasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-    return tasks;
-  }
 
-  // Handle fetching tasks
-  Future<void> _onFetchTasks(
-      FetchTasksEvent event, Emitter<TaskState> emit) async {
-        print("fetched all");
+  Future<void> _onFetchTasks(FetchTasksEvent event, Emitter<TaskState> emit) async {
     emit(TaskLoading());
     final res = await fetchTasks.call(event.userId);
     res.fold(
@@ -47,77 +41,87 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       },
       (r) {
         _sortedTasks = _sortTasksByDueDate(r);
-        emit(TaskLoaded(tasks: _sortedTasks));
+        _applyFilterPreferences(); 
       },
     );
   }
 
-  // Handle adding a task
+
+  List<UserTask> _sortTasksByDueDate(List<UserTask> tasks) {
+    tasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    return tasks;
+  }
+
+
   Future<void> _onAddTask(AddTaskEvent event, Emitter<TaskState> emit) async {
     emit(TaskLoading());
     final res = await addTask.call(event.task, event.userId);
     res.fold(
       (l) => emit(TaskError(message: l.message)),
       (r) {
-        // Add the new task to the sorted list
         _sortedTasks.add(event.task);
         _sortedTasks = _sortTasksByDueDate(_sortedTasks);
-        emit(TaskLoaded(tasks: _sortedTasks));
+        _applyFilterPreferences(); 
       },
     );
   }
 
-  // Handle editing a task
+
   Future<void> _onEditTask(EditTaskEvent event, Emitter<TaskState> emit) async {
     emit(TaskLoading());
     final res = await editTask.call(event.userId, event.taskId, event.task);
     res.fold(
       (l) => emit(TaskError(message: l.message)),
       (r) {
-        // Update the task and resort the list
         _sortedTasks = _sortedTasks.map((task) {
           return task.id == event.taskId ? event.task : task;
         }).toList();
         _sortedTasks = _sortTasksByDueDate(_sortedTasks);
-        emit(TaskLoaded(tasks: _sortedTasks));
+        _applyFilterPreferences(); 
       },
     );
   }
 
-  // Handle deleting a task
-  Future<void> _onDeleteTask(
-      DeleteTaskEvent event, Emitter<TaskState> emit) async {
-    // emit(TaskLoading());
+
+  Future<void> _onDeleteTask(DeleteTaskEvent event, Emitter<TaskState> emit) async {
     final res = await deleteTask.call(event.userId, event.taskId);
     res.fold(
       (l) => emit(TaskError(message: l.message)),
       (r) {
-        // Remove the task from the sorted list
         _sortedTasks.removeWhere((task) => task.id == event.taskId);
-        emit(TaskLoaded(tasks: _sortedTasks));
+        _applyFilterPreferences(); 
       },
     );
   }
 
-  void _onFilterTasks(FilterTasksEvent event, Emitter<TaskState> emit) {
+
+  Future<void> _applyFilterPreferences() async {
+
+    final priority = await FilterPreferences.getFilterPriority();
+   
+    final isDesc = await FilterPreferences.getFilterIsDesc();
 
     List<UserTask> filteredTasks = _sortedTasks;
 
-    if (event.priority != null && event.priority != "all") {
-      filteredTasks = filteredTasks.where((task) {
-        return task.priority.name == event.priority;
-      }).toList();
+    if (priority != 'all') {
+      filteredTasks = filteredTasks.where((task) => task.priority.name == priority).toList();
     }
 
-    if(event.isDesc!=null){
-      if(event.isDesc == true){
-        filteredTasks.sort((a, b) => b.dueDate.compareTo(a.dueDate));
-      }
-      else{
-        filteredTasks.sort((a, b) => a.dueDate.compareTo(b.dueDate));
-      }
+    if(isDesc!=null){
+      filteredTasks.sort((a, b) {
+        int dateComparison = (isDesc) ? b.dueDate.compareTo(a.dueDate) : a.dueDate.compareTo(b.dueDate) ;
+        if (dateComparison != 0) {
+          return dateComparison;
+        }
+        return (isDesc) ? b.title.compareTo(a.title) : (a.title.compareTo(b.title));} );
     }
 
     emit(TaskLoaded(tasks: filteredTasks));
   }
+
+  Future<void> _onFilterTasks(FilterTasksEvent event, Emitter<TaskState> emit) async {
+    await FilterPreferences.saveFilterPreferences(event.priority, event.isDesc);
+    _applyFilterPreferences(); 
+  }
+
 }
