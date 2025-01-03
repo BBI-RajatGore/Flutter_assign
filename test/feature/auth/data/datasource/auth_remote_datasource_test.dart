@@ -33,14 +33,14 @@ void main() {
     test('should create a new user and return the userId', () async {
       // Arrange
       when(() => mockUserCounterRef.get()).thenAnswer((_) async => mockDataSnapshot);
-      when(() => mockDataSnapshot.exists).thenReturn(true);  // Mock exists to return true
-      when(() => mockDataSnapshot.value).thenReturn(1);      // Mock value to return 1 (current user count)
+      when(() => mockDataSnapshot.exists).thenReturn(true);  
+      when(() => mockDataSnapshot.value).thenReturn(1);     
       final mockDatabaseReference = MockDatabaseReference();
       when(() => mockUsersRef.child('user_2')).thenReturn(mockDatabaseReference);
       when(() => mockDatabaseReference.set(any())).thenAnswer((_) async => Future.value());
 
       when(() => mockUserCounterRef.set(2)).thenAnswer((_) async => null); 
-      when(() => mockSharedPreferencesHelper.saveUserId('user_2')).thenAnswer((_) async => true); // Mock save userId in shared preferences
+      when(() => mockSharedPreferencesHelper.saveUserId('user_2')).thenAnswer((_) async => true); 
 
       // Act
       final result = await authRemoteDataSource.createUser();
@@ -59,13 +59,14 @@ void main() {
 
     test('should return failure if an error occurs during user creation', () async {
       // Arrange
-      when(() => mockUserCounterRef.get()).thenThrow(Exception('Error')); // Mocking error during get()
+      when(() => mockUserCounterRef.get()).thenThrow(Exception('Error')); 
 
       // Act
       final result = await authRemoteDataSource.createUser();
 
       // Assert
-      expect(result.isLeft(), true);  // Expect the result to be Left (failure)
+      expect(result.isLeft(), true); 
+
       result.fold(
         (failure) => expect(failure.message, 'Failed to create user: Exception: Error'),
         (userId) => fail('Expected failure, but got $userId'),
@@ -75,20 +76,21 @@ void main() {
 
   group('loginUser', () {
     test('should login the user successfully and save the userId', () async {
+
       // Arrange
       const testUserId = 'user_2';
       final mockDatabaseReference = MockDatabaseReference();
        when(() => mockUsersRef.child(testUserId)).thenReturn(mockDatabaseReference);
        when(() => mockDatabaseReference.get()).thenAnswer((_) async => mockDataSnapshot);
-      // when(() => mockUsersRef.child(testUserId).get()).thenAnswer((_) async => mockDataSnapshot);
-      when(() => mockDataSnapshot.exists).thenReturn(true); // Simulate that the user exists
+      when(() => mockDataSnapshot.exists).thenReturn(true); 
       when(() => mockSharedPreferencesHelper.saveUserId(testUserId)).thenAnswer((_) async => true);
 
       // Act
       final result = await authRemoteDataSource.loginUser(testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Expect the result to be Right (successful login)
+      expect(result.isRight(), true);  
+
       result.fold(
         (failure) => fail('Expected a userId, but got failure: ${failure.message}'),
         (userId) => expect(userId, testUserId),
@@ -103,13 +105,13 @@ void main() {
       final mockDatabaseReference = MockDatabaseReference();
       when(()=>mockUsersRef.child(testUserId)).thenReturn(mockDatabaseReference);
       when(() => mockDatabaseReference.get()).thenAnswer((_) async => mockDataSnapshot);
-      when(() => mockDataSnapshot.exists).thenReturn(false); // Simulate that the user does not exist
+      when(() => mockDataSnapshot.exists).thenReturn(false); 
 
       // Act
       final result = await authRemoteDataSource.loginUser(testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Expect the result to be Left (failure)
+      expect(result.isLeft(), true);  
       result.fold(
         (failure) => expect(failure.message, "User not registered"),
         (userId) => fail('Expected failure, but got $userId'),
@@ -125,7 +127,7 @@ void main() {
       final result = await authRemoteDataSource.loginUser(testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Expect the result to be Left (failure)
+      expect(result.isLeft(), true);  
       result.fold(
         (failure) => expect(failure.message, "Failed to login: Exception: Error"),
         (userId) => fail('Expected failure, but got $userId'),

@@ -48,7 +48,7 @@ void main() {
       final result = await remoteDataSource.addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true);  
       verify(() => taskRefe.set(any())).called(1);
     });
 
@@ -61,7 +61,7 @@ void main() {
       final result = await remoteDataSource.addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true); 
       result.fold(
         (failure) => expect(failure.message, "Failed to add task"),
         (success) => fail('Expected failure but got success'),
@@ -73,13 +73,12 @@ void main() {
      final taskRef = MockDatabaseReference();
       when(() => mockDatabaseReference.child(testUserId)).thenReturn(taskRef);
       when(()=>taskRef.child(testTaskId)).thenReturn(taskRef);
-     when(() => taskRef.remove()).thenAnswer((_) async => null);  // This returns a Future<void>
-
+     when(() => taskRef.remove()).thenAnswer((_) async => null);  
     // Act
     final result = await remoteDataSource.deleteTask(testUserId, testTaskId);
 
     // Assert
-    expect(result.isRight(), true);  // Should be a success (Right)
+    expect(result.isRight(), true); 
     verify(() => mockDatabaseReference.child(testUserId).child(testTaskId).remove()).called(1);
   });
 
@@ -95,7 +94,7 @@ void main() {
       final result = await remoteDataSource.deleteTask(testUserId, testTaskId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true);  
       result.fold(
         (failure) => expect(failure.message, 'Failed to delete task: Exception: Failed to delete task'),
         (success) => fail('Expected failure but got success'),
@@ -114,7 +113,7 @@ void main() {
       final result = await remoteDataSource.editTask(testUserId, testTaskId, testTask);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true);
       verify(() => mockDatabaseReference.child(testUserId).child(testTaskId).update(any())).called(1);
     });
 
@@ -162,11 +161,11 @@ void main() {
       final result = await remoteDataSource.fetchAllTasks(testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true); 
       result.fold(
         (failure) => fail('Expected success but got failure'),
         (tasks) {
-          expect(tasks.length, 2);  // Should return two tasks
+          expect(tasks.length, 2);  
           expect(tasks[0].title, 'task5');
           expect(tasks[1].title, 'task1');
         },
@@ -183,7 +182,7 @@ void main() {
       final result = await remoteDataSource.fetchAllTasks(testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true);  
       result.fold(
         (failure) => expect(failure.message, 'Failed to load tasks: Exception: Failed to load tasks'),
         (success) => fail('Expected failure but got success'),

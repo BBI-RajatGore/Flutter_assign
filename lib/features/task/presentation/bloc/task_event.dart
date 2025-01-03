@@ -102,3 +102,6 @@ class FilterTasksEvent extends TaskEvent {
   
   FilterTasksEvent({required this.userId, this.priority,this.isDesc});
 }
+
+
+class UserLoggedOutEvent extends TaskEvent {}

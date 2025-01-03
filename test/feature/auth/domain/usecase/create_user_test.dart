@@ -6,7 +6,6 @@ import 'package:task_manager/features/auth/domain/repositories/auth_repository.d
 import 'package:task_manager/features/auth/domain/usecase/create_user.dart';
 
 
-// Mock the AuthRepository
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
@@ -14,13 +13,13 @@ void main() {
   late CreateUser usecase;
   late MockAuthRepository repository;
 
-  // Set up the instances of the usecase and repository
+
   setUp(() {
     repository = MockAuthRepository();
     usecase = CreateUser(authRepository: repository);
   });
 
-  // Test case for Right (success)
+
   test('should return Right with user ID when createUser is successful', () async {
 
     const mockUserId = 'user_1';
@@ -32,18 +31,18 @@ void main() {
     final result = await usecase.call();
 
     // Assert
-    expect(result.isRight(), true); // Check if it's Right
+    expect(result.isRight(), true); 
 
     result.fold(
       (left) => fail('Expected a successful result, but got a failure.'),
-      (right) => expect(right, mockUserId), // Ensure the mock user ID is returned
+      (right) => expect(right, mockUserId), 
     );
 
     // Verify createUser was called once
-    verify(() => repository.createUser()).called(1);  // Ensure that the createUser method is called once
+    verify(() => repository.createUser()).called(1); 
   });
 
-  // Test case for Left (failure)
+
   test('should return Left with a Failure when createUser fails', () async {
     // Arrange
     when(() => repository.createUser()).thenAnswer((_) async => Left(Failure('failed')));
@@ -52,14 +51,13 @@ void main() {
     final result = await usecase.call();
 
     // Assert
-    expect(result.isLeft(), true); // Check if it's Left
+    expect(result.isLeft(), true); 
 
     result.fold(
-      (left) => expect(left.message, 'failed'), // Ensure the failure message matches
+      (left) => expect(left.message, 'failed'), 
       (right) => fail('Expected a failure, but got a successful result.'),
     );
 
-    // Verify createUser was called once
-    verify(() => repository.createUser()).called(1);  // Ensure that the createUser method is called once
+    verify(() => repository.createUser()).called(1);  
   });
 }

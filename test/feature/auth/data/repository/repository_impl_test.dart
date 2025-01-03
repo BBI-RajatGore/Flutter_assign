@@ -7,7 +7,7 @@ import 'package:task_manager/features/auth/data/datasource/auth_remote_data_sour
 import 'package:task_manager/features/auth/data/repository/auth_repository_impl.dart';
 
 
-// Mocking the dependencies
+
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 class MockSharedPreferencesHelper extends Mock implements SharedPreferencesHelper {}
@@ -17,14 +17,14 @@ void main() {
   late MockAuthRemoteDataSource mockAuthRemoteDataSource;
   late MockSharedPreferencesHelper mockSharedPreferencesHelper;
 
-  // Setup the mock instances
+
   setUp(() {
     mockAuthRemoteDataSource = MockAuthRemoteDataSource();
     mockSharedPreferencesHelper = MockSharedPreferencesHelper();
     repository = AuthRepositoryImpl(authRemoteDataSource: mockAuthRemoteDataSource,sharedPreferencesHelper: mockSharedPreferencesHelper);
   });
 
-  // Test createUser method
+
   group('createUser', () {
     test('should return Right with a token when createUser is successful', () async {
       const userId = 'user_1';
@@ -59,7 +59,7 @@ void main() {
     const userId = 'user_1';
 
     test('should return Right with a token when loginUser is successful', () async {
-      const mockToken = 'mockToken';
+      const mockToken = 'user_1';
       when(() => mockAuthRemoteDataSource.loginUser(userId)).thenAnswer((_) async => Right(mockToken));
 
       final result = await repository.loginUser(userId);
@@ -86,11 +86,11 @@ void main() {
     });
   });
 
-  // Test getUserStatus method
+
   group('getUserStatus', () {
     test('should return Right with userId when getUserStatus is successful', () async {
       const userId = 'user_1';
-      // Define behavior for getUserId method in MockSharedPreferencesHelper
+   
       when(() => mockSharedPreferencesHelper.getUserId()).thenAnswer((_) async => userId);
 
       final result = await repository.getUserStatus();

@@ -40,7 +40,7 @@ void main() {
       final result = await repository.addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true); 
       verify(() => mockRemoteDataSource.addTask(testTask, testUserId)).called(1);
     });
 
@@ -54,7 +54,7 @@ void main() {
       final result = await repository.addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true);  
       verify(() => mockRemoteDataSource.addTask(testTask, testUserId)).called(1);
     });
 
@@ -67,7 +67,7 @@ void main() {
       final result = await repository.deleteTask(testUserId, testTaskId);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true);  
       verify(() => mockRemoteDataSource.deleteTask(testUserId, testTaskId)).called(1);
     });
 
@@ -81,7 +81,7 @@ void main() {
       final result = await repository.deleteTask(testUserId, testTaskId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true); 
       verify(() => mockRemoteDataSource.deleteTask(testUserId, testTaskId)).called(1);
     });
 
@@ -94,7 +94,7 @@ void main() {
       final result = await repository.editTask(testUserId, testTaskId, testTask);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true);  
       verify(() => mockRemoteDataSource.editTask(testUserId, testTaskId, testTask)).called(1);
     });
 
@@ -108,7 +108,7 @@ void main() {
       final result = await repository.editTask(testUserId, testTaskId, testTask);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true); 
       verify(() => mockRemoteDataSource.editTask(testUserId, testTaskId, testTask)).called(1);
     });
 
@@ -122,11 +122,11 @@ void main() {
       final result = await repository.fetchAllTasks(testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Should be a success (Right)
+      expect(result.isRight(), true);  
       result.fold(
         (failure) => fail('Expected success but got failure'),
         (tasks) {
-          expect(tasks, taskList);  // Should return the correct list of tasks
+          expect(tasks, taskList); 
         },
       );
       verify(() => mockRemoteDataSource.fetchAllTasks(testUserId)).called(1);
@@ -142,7 +142,7 @@ void main() {
       final result = await repository.fetchAllTasks(testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Should be a failure (Left)
+      expect(result.isLeft(), true);  
       verify(() => mockRemoteDataSource.fetchAllTasks(testUserId)).called(1);
     });
   });

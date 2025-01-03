@@ -18,8 +18,8 @@ class SharedPreferencesHelper {
 
   Future<void> removeUserId() async {
     // to clear the filter 
-    FilterPreferences.clearFilterPreferences();
-    
+   await FilterPreferences.clearFilterPreferences();
+
     await sharedPreferences.remove(_userIdKey);
   }
 }

@@ -14,3 +14,18 @@ class FetchTask {
   }
 
 }
+
+// import 'package:fpdart/fpdart.dart';
+// import 'package:task_manager/core/error/failure.dart';
+// import 'package:task_manager/features/task/domain/repositories/task_repository.dart';
+// import 'package:task_manager/features/task/domain/entities/usertask.dart';
+
+// class FetchTask {
+//   final TaskRepository taskRespository;
+
+//   FetchTask({required this.taskRespository});
+
+//   Stream<Either<Failure, List<UserTask>>> call(String userId) async* {
+//     yield* taskRespository.fetchAllTasks(userId);
+//   }
+// }

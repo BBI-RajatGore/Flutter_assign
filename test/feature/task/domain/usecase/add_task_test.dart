@@ -39,17 +39,17 @@ void main() {
       final result = await addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isRight(), true);  // Check that the result is a success (Right)
+      expect(result.isRight(), true);  
       result.fold(
         (failure) => fail('Expected success but got failure'),
-        (_) => expect(null, null),  // Right<void> so should be `unit`
+        (_) => expect(null, null), 
       );
       verify(() => mockTaskRepository.addTask(testTask, testUserId)).called(1);
     });
 
     test('should return Failure when task addition fails', () async {
       // Arrange
-      final failure = Failure();  // Example of a failure
+      final failure = Failure();  
       when(() => mockTaskRepository.addTask(testTask, testUserId))
           .thenAnswer((_) async => Left(failure));
 
@@ -57,7 +57,7 @@ void main() {
       final result = await addTask(testTask, testUserId);
 
       // Assert
-      expect(result.isLeft(), true);  // Check that the result is a failure (Left)
+      expect(result.isLeft(), true);  
       result.fold(
         (failure) {
           expect(failure, isA<Failure>());

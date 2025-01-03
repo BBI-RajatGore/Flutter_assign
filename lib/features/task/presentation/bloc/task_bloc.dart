@@ -29,6 +29,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<EditTaskEvent>(_onEditTask);
     on<DeleteTaskEvent>(_onDeleteTask);
     on<FilterTasksEvent>(_onFilterTasks);
+    on<UserLoggedOutEvent>(_onUserLoggedOut);
   }
 
 
@@ -45,6 +46,21 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       },
     );
   }
+
+  // Future<void> _onFetchTasks(FetchTasksEvent event, Emitter<TaskState> emit) async {
+  //   emit(TaskLoading());
+  //   await for (var result in fetchTasks.call(event.userId)) {
+  //     result.fold(
+  //       (failure) {
+  //         emit(TaskError(message: failure.message));
+  //       },
+  //       (tasks) {
+  //         _sortedTasks = _sortTasksByDueDate(tasks);
+  //         _applyFilterPreferences();
+  //       },
+  //     );
+  //   }
+  // }
 
 
   List<UserTask> _sortTasksByDueDate(List<UserTask> tasks) {
@@ -122,6 +138,13 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   Future<void> _onFilterTasks(FilterTasksEvent event, Emitter<TaskState> emit) async {
     await FilterPreferences.saveFilterPreferences(event.priority, event.isDesc);
     _applyFilterPreferences(); 
+  }
+
+
+
+
+  Future<void> _onUserLoggedOut(UserLoggedOutEvent event, Emitter<TaskState> emit) async {
+    _sortedTasks.clear();
   }
 
 }

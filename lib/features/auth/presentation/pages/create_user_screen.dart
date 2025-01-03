@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_manager/core/utils/constant.dart';
+import 'package:task_manager/core/utils/routes.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_event.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
-import 'package:task_manager/features/task/presentation/pages/task_screen.dart';
+import 'package:task_manager/features/auth/presentation/widget/login_dialog_widget.dart';
 
 class CreateUserScreen extends StatelessWidget {
   @override
@@ -23,17 +25,18 @@ class CreateUserScreen extends StatelessWidget {
     );
   }
 
-  // Custom AppBar
   AppBar _buildAppBar() {
     return AppBar(
-      automaticallyImplyLeading: false, 
-      title: const Text("Create User",style: TextStyle(color: Colors.white),),
-      backgroundColor: Colors.deepPurple,  // App bar color
-      centerTitle: true,  // Center title
+      automaticallyImplyLeading: false,
+      title: const Text(
+        AppStrings.createUser,
+        style: AppTextStyles.titleStyle,
+      ),
+      backgroundColor: AppColors.grey,
+      centerTitle: true,
     );
   }
 
-  // Main content builder
   Column _buildMainContent(BuildContext context, AuthState state) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -44,21 +47,20 @@ class CreateUserScreen extends StatelessWidget {
         const SizedBox(height: 16),
         _buildLoginButton(context),
         const SizedBox(height: 30),
-        if (state is Loading) 
-          const CircularProgressIndicator(),
+        if (state is Loading) const CircularProgressIndicator(color: AppColors.grey,),
       ],
     );
   }
 
-
   ElevatedButton _buildCreateUserButton(BuildContext context) {
     return ElevatedButton(
+      key: const Key('createUserButton'),
       onPressed: () {
         context.read<AuthBloc>().add(CreateUserEvent());
       },
       child: const Text(
-        "Create New User",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+        AppStrings.createUser,
+        style: AppTextStyles.buttonTextStyle,
       ),
     );
   }
@@ -69,46 +71,43 @@ class CreateUserScreen extends StatelessWidget {
         _showLoginDialog(context);
       },
       child: const Text(
-        "Login",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+        AppStrings.login,
+        style: AppTextStyles.buttonTextStyle,
       ),
     );
   }
 
-
   void _authStateListener(BuildContext context, AuthState state) {
     if (state is UserLoggedIn) {
-      Navigator.pushReplacement(
+      Navigator.pushReplacementNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => TaskScreen(
-            userId: state.userId,
-          ),
-        ),
+        Routes.taskScreen,
+        arguments: state.userId,
       );
     } else if (state is AuthError) {
-      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(state.message)),
       );
     }
   }
 
-  
   void _showLoginDialog(BuildContext context) {
-    final TextEditingController _userIdController = TextEditingController();
+    final TextEditingController userIdController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return _LoginDialog(
-          controller: _userIdController,
+        return LoginDialog(
+          controller: userIdController,
           onLogin: () {
-            if (_userIdController.text.isNotEmpty) {
+            if (userIdController.text.isNotEmpty) {
+              Navigator.of(context).pop();
               context.read<AuthBloc>().add(
-                    LoginUserEvent(userId: _userIdController.text.trim()),
+                    LoginUserEvent(userId: userIdController.text.trim()),
                   );
+                 
             } else {
+              Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Please enter a user ID")),
               );
@@ -117,53 +116,6 @@ class CreateUserScreen extends StatelessWidget {
           onCancel: () => Navigator.pop(context),
         );
       },
-    );
-  }
-}
-
-
-class _LoginDialog extends StatelessWidget {
-  final TextEditingController controller;
-  final VoidCallback onLogin;
-  final VoidCallback onCancel;
-
-  const _LoginDialog({
-    required this.controller,
-    required this.onLogin,
-    required this.onCancel,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      title: const Text("Enter User ID"),
-      content: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: "Enter your user ID",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.deepPurple),
-          ),
-          prefixIcon: const Icon(Icons.person, color: Colors.deepPurple),
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: onLogin,
-          child: const Text("Login", style: TextStyle(color: Colors.deepPurple)),
-        ),
-        TextButton(
-          onPressed: onCancel,
-          child: const Text("Cancel"),
-        ),
-      ],
     );
   }
 }

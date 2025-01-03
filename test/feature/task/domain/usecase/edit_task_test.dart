@@ -33,45 +33,45 @@ void main() {
     );
 
     test('should return void when task is successfully edited', () async {
-      // Arrange: Mock the editTask response to return a success
+      // Arrange
       when(() => mockTaskRepository.editTask(testUserId, testTaskId, testTask))
           .thenAnswer((_) async => const Right(null));
 
-      // Act: Call the editTask use case
+      // Act
       final result = await editTask(testUserId, testTaskId, testTask);
 
-      // Assert: Ensure the result is a success (Right)
+      // Assert
       expect(result.isRight(), true);
 
-      // Verify that the editTask method was called exactly once with correct arguments
+
       result.fold(
         (failure) => fail('Expected success but got failure'),
-        (_) => expect(null, null),  // Right<void> should return `null`
+        (_) => expect(null, null), 
       );
       verify(() => mockTaskRepository.editTask(testUserId, testTaskId, testTask)).called(1);
     });
 
     test('should return Failure when task editing fails', () async {
-      // Arrange: Mock a failure response when editing the task
-      final failure = Failure();  // Example failure
+      // Arrange
+      final failure = Failure();  
       when(() => mockTaskRepository.editTask(testUserId, testTaskId, testTask))
           .thenAnswer((_) async => Left(failure));
 
-      // Act: Call the editTask use case
+      // Act
       final result = await editTask(testUserId, testTaskId, testTask);
 
-      // Assert: Ensure the result is a failure (Left)
+      // Assert
       expect(result.isLeft(), true);
 
-      // Verify that the failure type is correct
+
       result.fold(
         (failure) {
-          expect(failure, isA<Failure>()); // Ensure the failure is of type `Failure`
+          expect(failure, isA<Failure>()); 
         },
         (success) => fail('Expected failure but got success'),
       );
 
-      // Verify that the editTask method was called exactly once with correct arguments
+    
       verify(() => mockTaskRepository.editTask(testUserId, testTaskId, testTask)).called(1);
     });
   });

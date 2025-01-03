@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_manager/core/utils/routes.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_event.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
-import 'package:task_manager/features/task/domain/entities/priority.dart';
-import 'package:task_manager/features/task/domain/entities/usertask.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
+import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/priority_dropdown_widget.dart';
+import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/task_card_widget.dart';
+
+import 'package:task_manager/core/utils/constant.dart';
 
 class TaskScreen extends StatefulWidget {
   final String userId;
-  final Function? funtion;
+  final Function? function;
 
-  TaskScreen({required this.userId, this.funtion});
+  TaskScreen({required this.userId, this.function});
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-
   String? _selectedPriority;
   String? _selectedDueDate;
   int? _expandedTaskIndex;
@@ -38,11 +40,10 @@ class _TaskScreenState extends State<TaskScreen> {
     setState(() {
       _selectedPriority = prefs.getString('filter_priority') ?? 'all';
       bool isDesc = prefs.getBool('filter_is_desc') ?? false;
-      if(isDesc){
+      if (isDesc) {
         _selectedDueDate = "Desc";
-      }
-      else{
-        _selectedDueDate="Asc";
+      } else {
+        _selectedDueDate = "Asc";
       }
     });
   }
@@ -52,20 +53,18 @@ class _TaskScreenState extends State<TaskScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.grey,
         title: Text(
-          "Welcome ${widget.userId}",
+          "${TaskScreenConstants.appBarTitle}${widget.userId}",
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColors.white,
             fontSize: 15,
           ),
         ),
         actions: [
-          _buildStyledDropdown(
+          PriorityDropdown(
             value: _selectedPriority,
-            hintText: "Priority",
-            items: ['high', 'medium', 'low', 'all'],
             onChanged: (newValue) {
               setState(() {
                 _selectedPriority = newValue;
@@ -79,7 +78,7 @@ class _TaskScreenState extends State<TaskScreen> {
           ),
           _buildStyledDropdown(
             value: _selectedDueDate,
-            hintText: "Due Date",
+            hintText: TaskScreenConstants.filterDueDate,
             items: ['Desc', 'Asc'],
             onChanged: (newValue) {
               setState(() {
@@ -97,16 +96,17 @@ class _TaskScreenState extends State<TaskScreen> {
               if (state is UserLoggedOut) {
                 Navigator.pushReplacementNamed(
                   context,
-                  '/createUserScreen',
+                  Routes.createUserScreen,
                 );
               }
             },
             builder: (context, state) {
               return IconButton(
                 onPressed: () {
-                  context.read<AuthBloc>().add(LogoutUserEvent());
+                  _showLogoutConfirmationDialog();
                 },
-                icon: const Icon(Icons.logout, color: Colors.white),
+                icon: const Icon(Icons.logout, color: AppColors.white),
+                tooltip: TaskScreenConstants.logoutButtonTooltip,
               );
             },
           ),
@@ -118,14 +118,17 @@ class _TaskScreenState extends State<TaskScreen> {
             child: BlocBuilder<TaskBloc, TaskState>(
               builder: (context, state) {
                 if (state is TaskLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.grey,
+                    ),
+                  );
                 } else if (state is TaskLoaded) {
                   if (state.tasks.isEmpty) {
                     return const Center(
                       child: Text(
-                        "No Task Added",
-                        style:
-                            TextStyle(color: Colors.deepPurple, fontSize: 20),
+                        TaskScreenConstants.noTaskMessage,
+                        style: TextStyle(color: AppColors.grey, fontSize: 20),
                       ),
                     );
                   }
@@ -147,7 +150,7 @@ class _TaskScreenState extends State<TaskScreen> {
                           onEdit: () {
                             Navigator.pushNamed(
                               context,
-                              '/addTaskScreen',
+                              Routes.addTaskScreen,
                               arguments: {
                                 'userId': widget.userId,
                                 'task': task
@@ -163,18 +166,17 @@ class _TaskScreenState extends State<TaskScreen> {
                     ),
                   );
                 } else if (state is TaskError) {
-                  return Center(
+                  return const Center(
                     child: Text(
-                      state.message,
-                      style: const TextStyle(
-                          color: Colors.deepPurple, fontSize: 20),
+                      TaskScreenConstants.noTaskMessage,
+                      style: TextStyle(color: AppColors.grey, fontSize: 20),
                     ),
                   );
                 }
                 return const Center(
                   child: Text(
-                    "No Task Added",
-                    style: TextStyle(color: Colors.deepPurple, fontSize: 20),
+                    TaskScreenConstants.noTaskMessage,
+                    style: TextStyle(color: AppColors.grey, fontSize: 20),
                   ),
                 );
               },
@@ -186,27 +188,15 @@ class _TaskScreenState extends State<TaskScreen> {
         onPressed: () {
           Navigator.pushNamed(
             context,
-            '/addTaskScreen',
+            Routes.addTaskScreen,
             arguments: {'userId': widget.userId, 'task': null},
           );
         },
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.add, size: 30, color: Colors.white),
+        backgroundColor: AppColors.grey,
+        child: Icon(Icons.add, size: 30, color: AppColors.white),
+        tooltip: TaskScreenConstants.addTaskButtonTooltip,
       ),
     );
-  }
-
-  Color _getPriorityColor(Priority priority) {
-    switch (priority) {
-      case Priority.high:
-        return Colors.redAccent;
-      case Priority.medium:
-        return Colors.orange;
-      case Priority.low:
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
   }
 
   Widget _buildStyledDropdown({
@@ -218,9 +208,9 @@ class _TaskScreenState extends State<TaskScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.deepPurple,
+        color: AppColors.grey,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.deepPurple, width: 1),
+        border: Border.all(color: AppColors.grey, width: 1),
       ),
       child: DropdownButton<String>(
         value: value,
@@ -231,8 +221,9 @@ class _TaskScreenState extends State<TaskScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        dropdownColor: Colors.deepPurple,
-        icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 24),
+        dropdownColor: AppColors.dropdownColor,
+        icon:
+            const Icon(Icons.arrow_drop_down, color: AppColors.white, size: 24),
         onChanged: onChanged,
         items: items.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
@@ -240,129 +231,59 @@ class _TaskScreenState extends State<TaskScreen> {
             child: Text(
               value,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
           );
         }).toList(),
         style: const TextStyle(
-          color: Colors.white,
+          color: AppColors.white,
           fontSize: 16,
         ),
-        underline: SizedBox(),
+        underline: const SizedBox(),
       ),
     );
   }
-}
 
-class TaskCard extends StatelessWidget {
-  final UserTask task;
-  final bool isExpanded;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-
-  const TaskCard({
-    required this.task,
-    required this.isExpanded,
-    required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            ListTile(
-              leading: Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: _getPriorityColor(task.priority),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              title: Text(
-                task.title,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text('Due: ${task.dueDate}',
-                  style: const TextStyle(color: Colors.grey)),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: onEdit,
-                    icon: const Icon(Icons.edit, color: Colors.deepPurple),
-                  ),
-                  IconButton(
-                    onPressed: onDelete,
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
-                  ),
-                ],
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Confirm Logout',
+            style:
+                TextStyle(color: AppColors.grey, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Are you sure you want to log out ?',
+            style: TextStyle(color: AppColors.grey),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.grey),
               ),
             ),
-            if (isExpanded) ...[
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Title: ${task.title}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Description: ${task.description}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text('Due Date: ${task.dueDate}',
-                        style: const TextStyle(
-                          fontSize: 15,
-                        )),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Priority: ${task.priority.name}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
+            TextButton(
+              onPressed: () {
+                context.read<TaskBloc>().add(UserLoggedOutEvent());
+                context.read<AuthBloc>().add(LogoutUserEvent());
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: AppColors.errorColor),
               ),
-            ],
+            ),
           ],
-        ),
-      ),
+        );
+      },
     );
-  }
-
-  Color _getPriorityColor(Priority priority) {
-    switch (priority) {
-      case Priority.high:
-        return Colors.redAccent;
-      case Priority.medium:
-        return Colors.orange;
-      case Priority.low:
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
   }
 }

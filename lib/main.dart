@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_manager/core/utils/routes.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_event.dart';
 import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
@@ -12,11 +13,12 @@ import 'package:task_manager/features/task/presentation/pages/task_screen.dart';
 import 'package:task_manager/firebase_options.dart';
 import 'package:task_manager/service_locator.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
- 
+
   runApp(const MyApp());
 }
 
@@ -42,12 +44,12 @@ class MyApp extends StatelessWidget {
         initialRoute: '/',  
         routes: {
           '/': (context) => AuthStateWrapper(),
-          '/taskScreen': (context) {
+          Routes.taskScreen: (context) {
             final userId = ModalRoute.of(context)?.settings.arguments as String;
             return TaskScreen(userId: userId);
           },
-          '/createUserScreen': (context) => CreateUserScreen(),
-          '/addTaskScreen': (context) {
+          Routes.createUserScreen: (context) => CreateUserScreen(),
+          Routes.addTaskScreen: (context) {
             final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
             final userId = arguments['userId'] as String;
             final task = arguments['task'] as UserTask?;
@@ -59,30 +61,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class AuthStateWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is UserPresent) {
-          Navigator.pushReplacementNamed(
-            context,
-            '/taskScreen',
-            arguments: state.userId, 
-          );
-        } else {
-          Navigator.pushReplacementNamed(
-            context,
-            '/createUserScreen',
-          );
-        }
-      },
+    return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is Loading) {
-          return const Center(child: CircularProgressIndicator(),);
+        if (state is UserPresent) {
+          return TaskScreen(userId: state.userId);
         }
-        return const Center(child: CircularProgressIndicator(),);
+        return CreateUserScreen();
       },
     );
   }

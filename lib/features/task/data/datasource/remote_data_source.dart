@@ -6,6 +6,7 @@ import 'package:task_manager/features/task/domain/entities/usertask.dart';
 
 abstract class RemoteDataSource {
   Future<Either<Failure, List<UserTask>>> fetchAllTasks(String userId);
+  // Stream<Either<Failure, List<UserTask>>> fetchAllTasks(String userId);
   Future<Either<Failure, void>> addTask(UserTask task, String userId);
   Future<Either<Failure, void>> editTask(String userId, String taskId, UserTask task);
   Future<Either<Failure, void>> deleteTask(String userId, String taskId);
@@ -72,4 +73,29 @@ class RemoteDataSourceImpl extends RemoteDataSource {
       return Left(Failure('Failed to load tasks: $error'));
     }
   }
+
+
+  //   @override
+  // Stream<Either<Failure, List<UserTask>>> fetchAllTasks(String userId) async* {
+  //   try {
+  //     final taskStream = taskRef.child(userId).onValue;
+      
+  //     await for (var snapshot in taskStream) {
+  //       if (snapshot.snapshot.exists) {
+  //         final tasksMap = Map<String, dynamic>.from(snapshot.snapshot.value as Map);
+  //         List<UserTask> tasks = [];
+
+  //         tasksMap.forEach((taskId, taskData) {
+  //           tasks.add(UserTask.fromJson(taskData, taskId));
+  //         });
+
+  //         yield Right(tasks); // Emit the fetched tasks
+  //       } else {
+  //         yield Left(Failure("No tasks found"));
+  //       }
+  //     }
+  //   } catch (error) {
+  //     yield Left(Failure('Failed to fetch tasks: $error'));
+  //   }
+  // }
 }
