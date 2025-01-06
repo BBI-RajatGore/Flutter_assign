@@ -155,7 +155,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                 'userId': widget.userId,
                                 'task': task
                               },
-                            );
+                            ).then((_){
+                              context.read<TaskBloc>().add(FetchTasksEvent(userId: widget.userId));
+                            });
                           },
                           onDelete: () {
                             context.read<TaskBloc>().add(DeleteTaskEvent(
@@ -190,10 +192,12 @@ class _TaskScreenState extends State<TaskScreen> {
             context,
             Routes.addTaskScreen,
             arguments: {'userId': widget.userId, 'task': null},
-          );
+          ).then((_){
+            context.read<TaskBloc>().add(FetchTasksEvent(userId: widget.userId));
+          });
         },
         backgroundColor: AppColors.grey,
-        child: Icon(Icons.add, size: 30, color: AppColors.white),
+        child:  Icon(Icons.add, size: 30, color: AppColors.white),
         tooltip: TaskScreenConstants.addTaskButtonTooltip,
       ),
     );

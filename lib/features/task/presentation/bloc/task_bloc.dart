@@ -1,4 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:task_manager/core/utils/shared_preference_filter.dart';
 import 'package:task_manager/features/task/domain/usecases/add_task.dart';
@@ -139,9 +138,6 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     await FilterPreferences.saveFilterPreferences(event.priority, event.isDesc);
     _applyFilterPreferences(); 
   }
-
-
-
 
   Future<void> _onUserLoggedOut(UserLoggedOutEvent event, Emitter<TaskState> emit) async {
     _sortedTasks.clear();

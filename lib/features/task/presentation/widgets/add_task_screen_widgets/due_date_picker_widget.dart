@@ -24,10 +24,10 @@ class DueDatePicker extends StatelessWidget {
         final pickedDate = await showDatePicker(
           context: context,
           initialDate: dueDate,
-          firstDate: DateTime.now(),
+          firstDate: dueDate.isBefore(DateTime.now()) ? dueDate : DateTime.now(),
           lastDate: DateTime(2100),
         );
-        if (pickedDate != null && pickedDate.isAfter(DateTime.now())) {
+        if (pickedDate != null) {
           onDateChanged(pickedDate);
         }
       },

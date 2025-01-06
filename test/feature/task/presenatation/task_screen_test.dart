@@ -89,6 +89,9 @@ testWidgets('TaskScreen displays tasks correctly when loaded', (WidgetTester tes
   
   expect(find.text('Test Task 1'), findsOneWidget);
   expect(find.text('Test Task 2'), findsOneWidget);
+
+  expect(find.byIcon(Icons.delete), findsNWidgets(2));
+  expect(find.byIcon(Icons.edit), findsNWidgets(2));
 });
 
 
@@ -118,8 +121,6 @@ testWidgets('TaskScreen displays tasks correctly when loaded', (WidgetTester tes
 
     expect(find.byType(FloatingActionButton), findsOneWidget);
   });
-
-
 testWidgets('TaskScreen filters tasks based on priority', (WidgetTester tester) async {
 
   when(() => mockTaskBloc.state).thenReturn(
@@ -143,27 +144,128 @@ testWidgets('TaskScreen filters tasks based on priority', (WidgetTester tester) 
     ),
   );
 
-  
+
   await tester.pumpWidget(createTestableWidget(TaskScreen(userId: 'user123')));
 
 
-  await tester.pumpAndSettle();
+  expect(find.text('Test Task 1'), findsOneWidget);
+  expect(find.text('Test Task 2'), findsOneWidget);
 
-  expect(find.text('Test Task 1'), findsOneWidget); 
-  expect(find.text('Test Task 2'), findsOneWidget); 
+  await tester.tap(find.byType(DropdownButton<String>).first);
+  await tester.pump(); 
 
 
-  await tester.tap(find.text('Priority')); 
-  await tester.pumpAndSettle(); 
+  expect(find.byType(DropdownMenuItem<String>), findsNWidgets(4)); 
 
-  await tester.tap(find.text('high').last); 
+  when(() => mockTaskBloc.state).thenReturn(
+    TaskLoaded(
+      tasks: [
+        UserTask(
+          id: '1',
+          title: 'Test Task 1',
+          description: 'Description 1',
+          dueDate: DateTime.now(),
+          priority: Priority.high,
+        ),
+      ],
+    ),
+  );
+
+  await tester.tap(find.text('high'));
+  await tester.pump();
+
+  expect(find.text('Test Task 1'), findsNothing);
+
+
+  await tester.tap(find.byType(DropdownButton<String>).first); 
+  await tester.pump(); 
+
+
+  when(() => mockTaskBloc.state).thenReturn(
+    TaskLoaded(
+      tasks: [
+        UserTask(
+          id: '2',
+          title: 'Test Task 2',
+          description: 'Description 2',
+          dueDate: DateTime.now(),
+          priority: Priority.low,
+        ),
+      ],
+    ),
+  );
+
+
+  await tester.tap(find.text('low').last); 
+  await tester.pump(); 
+
+
+  expect(find.text('Test Task 2'), findsNothing);
+
+});
+
+
+testWidgets('TaskScreen filters tasks based on DueDate', (WidgetTester tester) async {
+
+  when(() => mockTaskBloc.state).thenReturn(
+    TaskLoaded(
+      tasks: [
+        UserTask(
+          id: '1',
+          title: 'Test Task 1',
+          description: 'Description 1',
+          dueDate: DateTime.now(),
+          priority: Priority.high,
+        ),
+        UserTask(
+          id: '2',
+          title: 'Test Task 2',
+          description: 'Description 2',
+          dueDate: DateTime.now(),
+          priority: Priority.low,
+        ),
+      ],
+    ),
+  );
+
+
+  await tester.pumpWidget(createTestableWidget(TaskScreen(userId: 'user123')));
   await tester.pumpAndSettle(); 
 
 
   expect(find.text('Test Task 1'), findsOneWidget);
-  expect(find.text('Test Task 2'), findsNothing); 
+  expect(find.text('Test Task 2'), findsOneWidget);
 
+  await tester.tap(find.byType(DropdownButton<String>).last);
+  await tester.pumpAndSettle();  
+
+  expect(find.byType(DropdownMenuItem<String>), findsNWidgets(2));
+
+
+  when(() => mockTaskBloc.state).thenReturn(
+    TaskLoaded(
+      tasks: [
+        UserTask(
+          id: '1',
+          title: 'Test Task 1',
+          description: 'Description 1',
+          dueDate: DateTime.now(),
+          priority: Priority.high,
+        ),
+      ],
+    ),
+  );
+
+
+  await tester.tap(find.text('Desc').last);
+  await tester.pumpAndSettle(); 
+
+  await tester.pumpAndSettle();
+
+  expect(find.text('Test Task 1'), findsOneWidget);
+  expect(find.text('Test Task 2'), findsNothing); 
 });
+
 
 
 testWidgets('Logout button logs out the user', (WidgetTester tester) async {
@@ -177,7 +279,7 @@ testWidgets('Logout button logs out the user', (WidgetTester tester) async {
   await tester.pumpWidget(createTestableWidget(TaskScreen(userId: 'user123')));
 
   await tester.tap(find.byIcon(Icons.logout));
-  await tester.pump(); 
+
 
   await tester.pumpAndSettle();  
   
