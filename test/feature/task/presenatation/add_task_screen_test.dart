@@ -88,6 +88,7 @@ void main() {
   });
 
   testWidgets('Save button triggers AddTaskEvent when creating a task', (WidgetTester tester) async {
+
     await tester.pumpWidget(createTestableWidget(AddTaskScreen(userId: 'user123')));
 
 
@@ -181,6 +182,8 @@ testWidgets('Should navigate to taskscreen after task updated', (WidgetTester te
 
 
   await tester.tap(saveButton);
+
+  verify(() => mockTaskBloc.add(AddTaskEvent(userId: 'user_1', task:existingTask[0])),).called(1);
   await tester.pump(); 
 
   await tester.pumpAndSettle();  

@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/core/utils/constant.dart';
 
-class PriorityDropdown extends StatelessWidget {
+class DuedateDropdownWidget extends StatelessWidget {
   final String? value;
+  final String hintText;
+  final List<String> items;
   final Function(String?) onChanged;
 
-  const PriorityDropdown({required this.value, required this.onChanged});
+  const DuedateDropdownWidget({
+    Key? key,
+    required this.value,
+    required this.hintText,
+    required this.items,
+    required this.onChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,17 +26,17 @@ class PriorityDropdown extends StatelessWidget {
       ),
       child: DropdownButton<String>(
         value: value,
-        hint: const Text(
-          "Priority",
-          style: TextStyle(
-            color: AppColors.white,
+        hint: Text(
+          hintText,
+          style: const TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
         dropdownColor: AppColors.dropdownColor,
-        icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 24),
+        icon: const Icon(Icons.arrow_drop_down, color: AppColors.white, size: 24),
         onChanged: onChanged,
-        items: ['high', 'medium', 'low', 'all'].map<DropdownMenuItem<String>>((String value) {
+        items: items.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
             child: Text(

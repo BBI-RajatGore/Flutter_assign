@@ -13,7 +13,6 @@ import 'package:task_manager/features/task/presentation/pages/task_screen.dart';
 import 'package:task_manager/firebase_options.dart';
 import 'package:task_manager/service_locator.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   init();

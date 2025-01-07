@@ -20,7 +20,7 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
-  final _formKey = GlobalKey<FormState>(); 
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   DateTime _dueDate = DateTime.now();
@@ -41,7 +41,14 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.task == null ? "Add Task" : "Edit Task", style: const TextStyle(color: Colors.white)),
+        title: Text(
+          widget.task == null
+              ? AddTaskScreenConstants.addTaskText
+              : AddTaskScreenConstants.editTaskText,
+          style: AppTextStyles.appBarStyle.copyWith(
+            fontSize: 25,
+          ),
+        ),
         elevation: 0,
         backgroundColor: AppColors.grey,
       ),
@@ -49,21 +56,25 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Form(
-            key: _formKey,  
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TaskFormField(
                   controller: _titleController,
-                  label: "Task Title",
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter a task title' : null,
+                  label: AddTaskScreenConstants.taskTitle,
+                  validator: (value) => value == null || value.isEmpty
+                      ? AddTaskScreenConstants.taskTitleValidationText
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TaskFormField(
                   controller: _descriptionController,
-                  label: "Task Description",
+                  label: AddTaskScreenConstants.taskDescription,
                   maxLines: 4,
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter a task description' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? AddTaskScreenConstants.taskDescValidationText
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 DueDatePicker(
@@ -88,15 +99,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   child: ElevatedButton(
                     onPressed: _submitForm,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 40),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: Text(
-                      widget.task == null ? "Add Task" : "Save Changes",
-                      style: const TextStyle(fontSize: 16, color: AppColors.grey, fontWeight: FontWeight.bold),
-                    ),
+                        widget.task == null
+                            ? AddTaskScreenConstants.addTaskText
+                            : AddTaskScreenConstants.saveChangesText,
+                        style: AppTextStyles.buttonTextStyle),
                   ),
                 ),
               ],
@@ -118,7 +131,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       );
 
       if (widget.task == null) {
-        context.read<TaskBloc>().add(AddTaskEvent(userId: widget.userId, task: task));
+        context
+            .read<TaskBloc>()
+            .add(AddTaskEvent(userId: widget.userId, task: task));
       } else {
         final updatedTask = widget.task!.copyWith(
           title: _titleController.text,
@@ -126,7 +141,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
           dueDate: _dueDate,
           priority: _priority,
         );
-        context.read<TaskBloc>().add(EditTaskEvent(userId: widget.userId, taskId: widget.task!.id, task: updatedTask));
+        context.read<TaskBloc>().add(EditTaskEvent(
+            userId: widget.userId, taskId: widget.task!.id, task: updatedTask));
       }
       Navigator.pop(context);
     }

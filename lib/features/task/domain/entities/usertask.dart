@@ -1,5 +1,3 @@
-
-
 import 'package:task_manager/features/task/domain/entities/priority.dart';
 
 class UserTask {
@@ -17,7 +15,7 @@ class UserTask {
     required this.priority,
   });
 
-  // Factory method to create a UserTask from a map.
+
   factory UserTask.fromJson(Map<dynamic, dynamic> map, String id) {
     return UserTask(
       id: id,
@@ -47,7 +45,6 @@ class UserTask {
     }
   }
 
-  // Method to convert UserTask to map, for saving in Firestore
   Map<String, dynamic> toJson() {
     return {
       'title': title,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/features/task/domain/entities/priority.dart';
 
 class AppColors {
+
   static const deepPurple = Color(0xFF6200EE);
   static const white = Colors.white;
   static const primaryBackground = Color(0xFFF5F5F5);
@@ -10,7 +11,7 @@ class AppColors {
   static const grey = Color.fromARGB(255, 131, 131, 131);
   static const dropdownColor = Color.fromARGB(255, 163, 161, 161);
 
-  static  Color getPriorityColor(Priority priority) {
+  static Color getPriorityColor(Priority priority) {
     switch (priority) {
       case Priority.high:
         return Colors.redAccent;
@@ -22,10 +23,16 @@ class AppColors {
         return Colors.grey;
     }
   }
-
 }
 
 class AppTextStyles {
+
+  static const appBarStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    color: AppColors.white,
+    fontSize: 15,
+  );
+
   static const titleStyle = TextStyle(
     color: AppColors.white,
     fontSize: 20,
@@ -53,7 +60,6 @@ class AppStrings {
   static const cancel = "Cancel";
 }
 
-
 class TaskScreenConstants {
   static const String appBarTitle = "Welcome ";
   static const String noTaskMessage = "No Task Added";
@@ -62,4 +68,18 @@ class TaskScreenConstants {
   static const String taskLoadingMessage = "Loading tasks...";
   static const String logoutButtonTooltip = "Logout";
   static const String addTaskButtonTooltip = "Add New Task";
+  static const String logoutConfirmationTitleText = "Confirm Logout";
+  static const String logoutConfirmationText = "Are you sure you want to log out ?";
+  static const String deleteConfirmationTitleText = "Confirm Delete";
+  static const String deleteConfirmationText = "Are you sure you want to delete?";
+}
+
+class AddTaskScreenConstants{
+  static const String addTaskText="Add Task";
+  static const String saveChangesText="Save Changes";
+  static const String editTaskText="Edit Task";
+  static const String taskTitle="Task Title";
+  static const String taskDescription="Task Description";
+  static const String taskTitleValidationText='Please enter a task title';
+  static const String taskDescValidationText='Please enter a task description';
 }

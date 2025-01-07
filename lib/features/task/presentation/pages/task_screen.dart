@@ -8,9 +8,11 @@ import 'package:task_manager/features/auth/presentation/bloc/auth_state.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_bloc.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_event.dart';
 import 'package:task_manager/features/task/presentation/bloc/task_state.dart';
+import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/delete_confirmation_dialog_widget.dart';
+import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/duedate_dropdown_widget.dart';
+import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/logout_confirmation_dialog_widget.dart';
 import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/priority_dropdown_widget.dart';
 import 'package:task_manager/features/task/presentation/widgets/task_screen_widgets/task_card_widget.dart';
-
 import 'package:task_manager/core/utils/constant.dart';
 
 class TaskScreen extends StatefulWidget {
@@ -40,11 +42,7 @@ class _TaskScreenState extends State<TaskScreen> {
     setState(() {
       _selectedPriority = prefs.getString('filter_priority') ?? 'all';
       bool isDesc = prefs.getBool('filter_is_desc') ?? false;
-      if (isDesc) {
-        _selectedDueDate = "Desc";
-      } else {
-        _selectedDueDate = "Asc";
-      }
+      _selectedDueDate = isDesc ? "Desc" : "Asc";
     });
   }
 
@@ -56,11 +54,7 @@ class _TaskScreenState extends State<TaskScreen> {
         backgroundColor: AppColors.grey,
         title: Text(
           "${TaskScreenConstants.appBarTitle}${widget.userId}",
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.white,
-            fontSize: 15,
-          ),
+          style: AppTextStyles.appBarStyle,
         ),
         actions: [
           PriorityDropdown(
@@ -76,7 +70,7 @@ class _TaskScreenState extends State<TaskScreen> {
                   ));
             },
           ),
-          _buildStyledDropdown(
+          DuedateDropdownWidget(
             value: _selectedDueDate,
             hintText: TaskScreenConstants.filterDueDate,
             items: ['Desc', 'Asc'],
@@ -155,14 +149,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                 'userId': widget.userId,
                                 'task': task
                               },
-                            ).then((_){
+                            ).then((_) {
                               context.read<TaskBloc>().add(FetchTasksEvent(userId: widget.userId));
                             });
                           },
-                          onDelete: () {
-                            context.read<TaskBloc>().add(DeleteTaskEvent(
-                                userId: widget.userId, taskId: task.id));
-                          },
+                          onDelete: () => _showDeleteConfirmation(task.id),
                         );
                       },
                     ),
@@ -171,14 +162,14 @@ class _TaskScreenState extends State<TaskScreen> {
                   return const Center(
                     child: Text(
                       TaskScreenConstants.noTaskMessage,
-                      style: TextStyle(color: AppColors.grey, fontSize: 20),
+                      style: AppTextStyles.titleStyle,
                     ),
                   );
                 }
                 return const Center(
                   child: Text(
                     TaskScreenConstants.noTaskMessage,
-                    style: TextStyle(color: AppColors.grey, fontSize: 20),
+                    style: AppTextStyles.titleStyle,
                   ),
                 );
               },
@@ -187,65 +178,19 @@ class _TaskScreenState extends State<TaskScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        elevation: 8,
         onPressed: () {
           Navigator.pushNamed(
             context,
             Routes.addTaskScreen,
             arguments: {'userId': widget.userId, 'task': null},
-          ).then((_){
+          ).then((_) {
             context.read<TaskBloc>().add(FetchTasksEvent(userId: widget.userId));
           });
         },
         backgroundColor: AppColors.grey,
-        child:  Icon(Icons.add, size: 30, color: AppColors.white),
+        child: const Icon(Icons.add, size: 30, color: AppColors.white),
         tooltip: TaskScreenConstants.addTaskButtonTooltip,
-      ),
-    );
-  }
-
-  Widget _buildStyledDropdown({
-    required String? value,
-    required String hintText,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-      decoration: BoxDecoration(
-        color: AppColors.grey,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.grey, width: 1),
-      ),
-      child: DropdownButton<String>(
-        value: value,
-        hint: Text(
-          hintText,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        dropdownColor: AppColors.dropdownColor,
-        icon:
-            const Icon(Icons.arrow_drop_down, color: AppColors.white, size: 24),
-        onChanged: onChanged,
-        items: items.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          );
-        }).toList(),
-        style: const TextStyle(
-          color: AppColors.white,
-          fontSize: 16,
-        ),
-        underline: const SizedBox(),
       ),
     );
   }
@@ -254,38 +199,22 @@ class _TaskScreenState extends State<TaskScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Confirm Logout',
-            style:
-                TextStyle(color: AppColors.grey, fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'Are you sure you want to log out ?',
-            style: TextStyle(color: AppColors.grey),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.grey),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<TaskBloc>().add(UserLoggedOutEvent());
-                context.read<AuthBloc>().add(LogoutUserEvent());
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Confirm',
-                style: TextStyle(color: AppColors.errorColor),
-              ),
-            ),
-          ],
+        return LogoutConfirmationDialog(onConfirm: () {
+          context.read<TaskBloc>().add(UserLoggedOutEvent());
+          context.read<AuthBloc>().add(LogoutUserEvent());
+        });
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(final id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteConfirmationDialog(
+          onConfirm: () {
+            context.read<TaskBloc>().add(DeleteTaskEvent(userId: widget.userId, taskId: id));
+          },
         );
       },
     );

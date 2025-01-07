@@ -20,7 +20,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 5,
+      elevation: 8,
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -43,17 +43,23 @@ class TaskCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text('Due: ${task.dueDate}',
-                  style: const TextStyle(color: Colors.grey)),
+                  style: const TextStyle(color: AppColors.grey)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     onPressed: onEdit,
-                    icon: const Icon(Icons.edit, color: AppColors.deepPurple),
+                    icon: const Icon(
+                      Icons.edit,
+                      color: AppColors.deepPurple,
+                    ),
                   ),
                   IconButton(
                     onPressed: onDelete,
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.redAccent,
+                    ),
                   ),
                 ],
               ),
@@ -62,10 +68,15 @@ class TaskCard extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               firstChild: Container(),
               secondChild: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                      color: const Color.fromARGB(255, 144, 144, 144),
+                      height: 0.5,
+                    ),
+                    const SizedBox(height: 8),
                     textWidget('Title: ${task.title}'),
                     const SizedBox(height: 8),
                     textWidget('Description: ${task.description}'),
@@ -76,7 +87,9 @@ class TaskCard extends StatelessWidget {
                   ],
                 ),
               ),
-              crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              crossFadeState: isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
             ),
           ],
         ),
@@ -87,9 +100,7 @@ class TaskCard extends StatelessWidget {
   Widget textWidget(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 15,
-      ),
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
     );
   }
 }
