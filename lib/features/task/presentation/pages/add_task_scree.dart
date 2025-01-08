@@ -20,6 +20,7 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -63,16 +64,17 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 TaskFormField(
                   controller: _titleController,
                   label: AddTaskScreenConstants.taskTitle,
-                  validator: (value) => value == null || value.isEmpty
+                  validator: (value) => value == null || value.trim().isEmpty 
                       ? AddTaskScreenConstants.taskTitleValidationText
                       : null,
+                 
                 ),
                 const SizedBox(height: 16),
                 TaskFormField(
                   controller: _descriptionController,
                   label: AddTaskScreenConstants.taskDescription,
-                  maxLines: 4,
-                  validator: (value) => value == null || value.isEmpty
+                  maxLines: 8,
+                  validator: (value) => value == null || value.trim().isEmpty
                       ? AddTaskScreenConstants.taskDescValidationText
                       : null,
                 ),

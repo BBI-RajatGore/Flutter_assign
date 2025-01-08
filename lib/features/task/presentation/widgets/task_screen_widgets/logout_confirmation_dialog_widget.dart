@@ -21,7 +21,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text(
-            'Cancel',
+            TaskScreenConstants.cancelText,
             style: TextStyle(color: AppColors.grey),
           ),
         ),
@@ -31,7 +31,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
             Navigator.pop(context);
           },
           child: const Text(
-            'Confirm',
+            TaskScreenConstants.confirmText,
             style: TextStyle(color: AppColors.errorColor),
           ),
         ),

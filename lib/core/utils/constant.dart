@@ -78,6 +78,8 @@ class TaskScreenConstants {
   static const String logoutConfirmationText = "Are you sure you want to log out ?";
   static const String deleteConfirmationTitleText = "Confirm Delete";
   static const String deleteConfirmationText = "Are you sure you want to delete?";
+  static const String cancelText="Cancel";
+  static const String confirmText="Confirm";
 }
 
 class AddTaskScreenConstants{

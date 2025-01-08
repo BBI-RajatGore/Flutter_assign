@@ -3,7 +3,7 @@ import 'package:task_manager/features/task/domain/entities/usertask.dart';
 import 'package:task_manager/core/utils/constant.dart';
 
 class TaskCard extends StatelessWidget {
-  
+
   final UserTask task;
   final bool isExpanded;
   final VoidCallback onTap;
@@ -78,13 +78,13 @@ class TaskCard extends StatelessWidget {
                       height: 0.5,
                     ),
                     const SizedBox(height: 8),
-                    textWidget('Title: ${task.title}'),
+                    textWidget('Title:  ', task.title, context),
                     const SizedBox(height: 8),
-                    textWidget('Description: ${task.description}'),
+                    textWidget('Description:  ', task.description, context),
                     const SizedBox(height: 8),
-                    textWidget('Due Date: ${task.dueDate}'),
+                    textWidget('Due Date:  ', task.dueDate.toString(), context),
                     const SizedBox(height: 8),
-                    textWidget('Priority: ${task.priority.name}'),
+                    textWidget('Priority:  ', task.priority.name, context),
                   ],
                 ),
               ),
@@ -98,10 +98,31 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  Widget textWidget(String text) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+  Widget textWidget(String title, String subtitle, BuildContext context) {
+    return RichText(
+      maxLines: 5,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: DefaultTextStyle.of(context).style,
+        children: <TextSpan>[
+          TextSpan(
+            text: title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              fontSize: 15,
+            ),
+          ),
+          TextSpan(
+            text: subtitle,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 84, 84, 84),
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
     );
   }
+  
 }
