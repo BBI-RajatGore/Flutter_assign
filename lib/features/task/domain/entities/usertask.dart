@@ -1,6 +1,7 @@
 import 'package:task_manager/features/task/domain/entities/priority.dart';
 
 class UserTask {
+  
   final String id;
   final String title;
   final String description;
@@ -50,7 +51,7 @@ class UserTask {
       'title': title,
       'description': description,
       'dueDate': dueDate.toIso8601String(),
-      'priority': _priorityToString(priority),  // Storing as string
+      'priority': _priorityToString(priority),  
     };
   }
 
@@ -70,7 +71,6 @@ class UserTask {
       priority: priority ?? this.priority,
     );
   }
+
 }
-
-
 

@@ -122,7 +122,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     return const Center(
                       child: Text(
                         TaskScreenConstants.noTaskMessage,
-                        style: TextStyle(color: AppColors.grey, fontSize: 20),
+                        style: AppTextStyles.noTaskMsgStyle,
                       ),
                     );
                   }
@@ -162,14 +162,14 @@ class _TaskScreenState extends State<TaskScreen> {
                   return const Center(
                     child: Text(
                       TaskScreenConstants.noTaskMessage,
-                      style: AppTextStyles.titleStyle,
+                      style: AppTextStyles.noTaskMsgStyle,
                     ),
                   );
                 }
                 return const Center(
                   child: Text(
                     TaskScreenConstants.noTaskMessage,
-                    style: AppTextStyles.titleStyle,
+                    style: AppTextStyles.noTaskMsgStyle,
                   ),
                 );
               },

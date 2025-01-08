@@ -3,6 +3,7 @@ import 'package:task_manager/features/task/domain/entities/usertask.dart';
 import 'package:task_manager/core/utils/constant.dart';
 
 class TaskCard extends StatelessWidget {
+  
   final UserTask task;
   final bool isExpanded;
   final VoidCallback onTap;
@@ -58,7 +59,7 @@ class TaskCard extends StatelessWidget {
                     onPressed: onDelete,
                     icon: const Icon(
                       Icons.delete,
-                      color: Colors.redAccent,
+                      color: AppColors.redAccent,
                     ),
                   ),
                 ],

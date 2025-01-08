@@ -10,6 +10,7 @@ class AppColors {
   static const orange = Color.fromARGB(255, 255, 166, 1);
   static const grey = Color.fromARGB(255, 131, 131, 131);
   static const dropdownColor = Color.fromARGB(255, 163, 161, 161);
+  static const redAccent = Colors.redAccent;
 
   static Color getPriorityColor(Priority priority) {
     switch (priority) {
@@ -49,6 +50,11 @@ class AppTextStyles {
     fontSize: 16,
     color: AppColors.deepPurple,
   );
+
+  static const noTaskMsgStyle = TextStyle(
+    color: AppColors.grey, fontSize: 20,
+  );
+
 }
 
 class AppStrings {
@@ -84,13 +90,11 @@ class AddTaskScreenConstants{
   static const String taskDescValidationText='Please enter a task description';
 }
 
-
 class AuthRemoteDataSourceConstant{
   static const String failedUserCreationText="Failed to create user";
   static const String userNotRegiText="User not registered!";
   static const String failedToLoginText="Failed to login User";
 }
-
 
 class TaskRemoteDataSourceConstant{
   static const String failedToAddTaskText = "Failed to add task";

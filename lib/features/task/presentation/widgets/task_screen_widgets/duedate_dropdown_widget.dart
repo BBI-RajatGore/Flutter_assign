@@ -29,7 +29,7 @@ class DuedateDropdownWidget extends StatelessWidget {
         hint: Text(
           hintText,
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
