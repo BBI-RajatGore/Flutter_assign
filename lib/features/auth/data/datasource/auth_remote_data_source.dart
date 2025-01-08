@@ -1,9 +1,7 @@
-
-
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:task_manager/core/error/failure.dart';
+import 'package:task_manager/core/utils/constant.dart';
 import 'package:task_manager/features/auth/data/datasource/auth_local_data_source.dart';
 
 abstract class AuthRemoteDataSource {
@@ -12,6 +10,7 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
+  
   final SharedPreferencesHelper sharedPreferencesHelper;
   final DatabaseReference userCounterRef;
   final DatabaseReference usersRef;
@@ -40,7 +39,7 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
 
       return Right(newUserId);
     } catch (error) {
-      return Left(Failure('Failed to create user: $error'));
+      return Left(Failure(AuthRemoteDataSourceConstant.failedUserCreationText));
     }
   }
 
@@ -53,10 +52,10 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource {
         await sharedPreferencesHelper.saveUserId(userId);  
         return Right(userId); 
       } else {
-        return Left(Failure('User not registered'));
+        return Left(Failure(AuthRemoteDataSourceConstant.userNotRegiText));
       }
     } catch (error) {
-      return Left(Failure('Failed to login: $error'));
+      return Left(Failure(AuthRemoteDataSourceConstant.failedToLoginText));
     }
   }
 }

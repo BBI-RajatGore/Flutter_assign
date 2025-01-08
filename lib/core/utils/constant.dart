@@ -83,3 +83,19 @@ class AddTaskScreenConstants{
   static const String taskTitleValidationText='Please enter a task title';
   static const String taskDescValidationText='Please enter a task description';
 }
+
+
+class AuthRemoteDataSourceConstant{
+  static const String failedUserCreationText="Failed to create user";
+  static const String userNotRegiText="User not registered!";
+  static const String failedToLoginText="Failed to login User";
+}
+
+
+class TaskRemoteDataSourceConstant{
+  static const String failedToAddTaskText = "Failed to add task";
+  static const String failedToDeleteTaskText="Failed to delete task";
+  static const String failedToEditTaskText="Failed to edit task";
+  static const String noTaskFoundText="No task found";
+  static const String failedToLoadTaskText="Failed to load task";
+}

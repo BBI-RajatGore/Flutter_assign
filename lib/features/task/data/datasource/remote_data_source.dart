@@ -2,6 +2,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:task_manager/core/error/failure.dart';
+import 'package:task_manager/core/utils/constant.dart';
 import 'package:task_manager/features/task/domain/entities/usertask.dart';
 
 abstract class RemoteDataSource {
@@ -25,7 +26,7 @@ class RemoteDataSourceImpl extends RemoteDataSource {
       await taskRefe.set(task.toJson()); 
       return const Right(null);
     } catch (error) {
-      return Left(Failure("Failed to add task"));
+      return Left(Failure(TaskRemoteDataSourceConstant.failedToAddTaskText));
     }
   }
 
@@ -36,7 +37,7 @@ class RemoteDataSourceImpl extends RemoteDataSource {
       await taskRefe.remove();
       return const Right(null);
     } catch (e) {
-      return Left(Failure('Failed to delete task: $e'));
+      return Left(Failure(TaskRemoteDataSourceConstant.failedToDeleteTaskText));
     }
   }
 
@@ -47,7 +48,7 @@ class RemoteDataSourceImpl extends RemoteDataSource {
       await taskRefe.update(task.toJson());
       return const Right(null);
     } catch (error) {
-      return Left(Failure('Failed to edit task: $error'));
+      return Left(Failure(TaskRemoteDataSourceConstant.failedToEditTaskText));
     }
   }
 
@@ -68,10 +69,10 @@ class RemoteDataSourceImpl extends RemoteDataSource {
 
         return Right(tasks);
       } else {
-        return Left(Failure("No Task Found"));
+        return Left(Failure(TaskRemoteDataSourceConstant.noTaskFoundText),);
       }
     } catch (error) {
-      return Left(Failure('Failed to load tasks: $error'));
+      return Left(Failure(TaskRemoteDataSourceConstant.failedToLoadTaskText),);
     }
   }
 
