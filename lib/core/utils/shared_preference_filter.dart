@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class FilterPreferences {
 
   static const String _filterPriorityKey = 'filter_priority';
@@ -10,8 +11,7 @@ class FilterPreferences {
     final prefs = await SharedPreferences.getInstance();
 
     if (priority != null) {
-      await prefs.setString(_filterPriorityKey, priority);
-      
+      await  prefs.setString(_filterPriorityKey, priority);
     }
     if (isDesc != null) {
       await prefs.setBool(_filterIsDescKey, isDesc);

@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '379945935699',
     projectId: 'task-manager-bb',
     authDomain: 'task-manager-bb.firebaseapp.com',
+    databaseURL: 'https://task-manager-bb-default-rtdb.firebaseio.com/', // for web app 
     storageBucket: 'task-manager-bb.firebasestorage.app',
   );
 

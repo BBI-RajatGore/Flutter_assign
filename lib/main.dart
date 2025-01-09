@@ -39,20 +39,33 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/',  
+        initialRoute: Routes.initialRoute,  
         routes: {
-          '/': (context) => AuthStateWrapper(),
-          Routes.taskScreen: (context) {
-            final userId = ModalRoute.of(context)?.settings.arguments as String;
-            return TaskScreen(userId: userId);
-          },
-          Routes.createUserScreen: (context) => CreateUserScreen(),
-          Routes.addTaskScreen: (context) {
-            final arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+          Routes.initialRoute:(context)=> AuthStateWrapper(),
+          Routes.createUserScreen:(context) => CreateUserScreen()
+        },
+        onGenerateRoute: (settings){
+
+          if(settings.name == Routes.taskScreen){
+            final userId = settings.arguments as String?;
+            if(userId != null){
+              return MaterialPageRoute(
+                builder: (context) => TaskScreen(userId: userId),
+              );
+            }
+          }
+
+          if(settings.name == Routes.addTaskScreen){
+            final arguments = settings.arguments as Map<String, dynamic>;
             final userId = arguments['userId'] as String;
             final task = arguments['task'] as UserTask?;
-            return AddTaskScreen(userId: userId, task: task);
-          },
+
+            return MaterialPageRoute(
+              builder: (context) => AddTaskScreen(userId: userId, task: task),
+            );
+          }
+
+          return null;
         },
       ),
     );

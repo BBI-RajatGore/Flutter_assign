@@ -10,5 +10,4 @@ abstract class TaskRepository{
   Future<Either<Failure,void>> addTask(UserTask task,String userId);
   Future<Either<Failure, void>> editTask(String userId, String taskId, UserTask task);
   Future<Either<Failure, void>> deleteTask(String userId, String taskId);
-  
 }

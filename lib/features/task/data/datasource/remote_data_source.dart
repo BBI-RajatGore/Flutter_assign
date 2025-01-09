@@ -68,6 +68,7 @@ class RemoteDataSourceImpl extends RemoteDataSource {
         });
 
         return Right(tasks);
+        
       } else {
         return Left(Failure(TaskRemoteDataSourceConstant.noTaskFoundText),);
       }

@@ -20,12 +20,15 @@ class TaskScreen extends StatefulWidget {
   final Function? function;
 
   TaskScreen({required this.userId, this.function});
+  
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
 }
 
 class _TaskScreenState extends State<TaskScreen> {
+
+
   String? _selectedPriority;
   String? _selectedDueDate;
   int? _expandedTaskIndex;
@@ -73,7 +76,7 @@ class _TaskScreenState extends State<TaskScreen> {
           DuedateDropdownWidget(
             value: _selectedDueDate,
             hintText: TaskScreenConstants.filterDueDate,
-            items: ['Desc', 'Asc'],
+            items: const ['Desc', 'Asc'],
             onChanged: (newValue) {
               setState(() {
                 _selectedDueDate = newValue;
@@ -189,8 +192,8 @@ class _TaskScreenState extends State<TaskScreen> {
           });
         },
         backgroundColor: AppColors.grey,
-        child: const Icon(Icons.add, size: 30, color: AppColors.white),
         tooltip: TaskScreenConstants.addTaskButtonTooltip,
+        child: const Icon(Icons.add, size: 30, color: AppColors.white),
       ),
     );
   }
