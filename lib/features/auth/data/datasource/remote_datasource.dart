@@ -12,6 +12,7 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  
   final FirebaseAuth _firebaseAuth;
   final GoogleAuthProvider _googleAuthProvider;
   final AuthLocalDataSource _authLocalDataSource; 

@@ -40,7 +40,8 @@ class AuthRepositoryImpl implements AuthRepository {
       final userId = await authLocalDataSource.getUserId();
       print("userId in repository impl : $userId");
       if(userId == null){
-        return Left(Failure("No user id found"));
+        print("Local data source returned null i.e id");
+        return Left(Failure("No user id found"),);
       }
       return Right(userId);
     }

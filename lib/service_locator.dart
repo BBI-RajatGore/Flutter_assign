@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerce_app/features/auth/data/datasource/local_datasource.dart';
 import 'package:ecommerce_app/features/auth/data/datasource/remote_datasource.dart';
 import 'package:ecommerce_app/features/auth/data/repositories/respositories_impl.dart';
@@ -8,6 +9,14 @@ import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_google_us
 import 'package:ecommerce_app/features/auth/domain/usecase/signout_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signup_with_email_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ecommerce_app/features/profile/data/datasource/remote_data_source.dart';
+import 'package:ecommerce_app/features/profile/data/repositories/profile_repositories_impl.dart';
+import 'package:ecommerce_app/features/profile/domain/repositories/profile_repositories.dart';
+import 'package:ecommerce_app/features/profile/domain/usecase/checkprofilestatus_usecase.dart';
+import 'package:ecommerce_app/features/profile/domain/usecase/getprofile_usecase.dart';
+import 'package:ecommerce_app/features/profile/domain/usecase/saveprofile_usecase.dart';
+import 'package:ecommerce_app/features/profile/domain/usecase/updateprofile_usecase.dart';
+import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +25,7 @@ final getIt = GetIt.instance;
 
 Future<void> serviceLocator() async {
 
+  // auth feature
   final sharedPreferences = await SharedPreferences.getInstance();
 
   getIt.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
@@ -34,23 +44,33 @@ Future<void> serviceLocator() async {
           ));
 
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt(),getIt()),
+    () => AuthRepositoryImpl(getIt(), getIt()),
   );
 
   getIt.registerLazySingleton<SignUpWithEmailPassword>(
-    ()=> SignUpWithEmailPassword(getIt(),),
+    () => SignUpWithEmailPassword(
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<SignInWithEmailPassword>(
-   ()=> SignInWithEmailPassword(getIt(),),
+    () => SignInWithEmailPassword(
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<SignInWithGoogle>(
-   () => SignInWithGoogle(getIt(),),
+    () => SignInWithGoogle(
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<SignOut>(
-   ()=> SignOut(getIt(),),
+    () => SignOut(
+      getIt(),
+    ),
   );
   getIt.registerLazySingleton<GetUidFromLocalDataSource>(
-   ()=> GetUidFromLocalDataSource(getIt(),),
+    () => GetUidFromLocalDataSource(
+      getIt(),
+    ),
   );
 
   getIt.registerFactory<AuthBloc>(
@@ -62,4 +82,58 @@ Future<void> serviceLocator() async {
       getUidFromLocalDataSource: getIt(),
     ),
   );
+
+
+
+  // profile feature
+
+  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);  
+
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      profileRemoteDataSource: getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<CheckprofilestatusUsecase>(
+    () => CheckprofilestatusUsecase(
+      getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<GetprofileUsecase>(
+    () => GetprofileUsecase(
+      getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<SaveProfileUseCase>(
+    () => SaveProfileUseCase(
+      getIt(),
+    ),
+  );
+  getIt.registerLazySingleton<UpdateprofileUsecase>(
+    () => UpdateprofileUsecase(
+      getIt(),
+    ),
+  );
+
+
+  getIt.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      saveProfileUseCase: getIt(),
+      updateprofileUsecase: getIt(),
+      getProfileUsecase: getIt(),
+      checkProfileStatusUsecase: getIt(),
+    ),
+  );
+
+
+
+
+
 }

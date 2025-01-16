@@ -23,6 +23,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> clearUserId() async {
-    await sharedPreferences.remove('user_id');
+    await sharedPreferences.remove("user_id");
   }
 }

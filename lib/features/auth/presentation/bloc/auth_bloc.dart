@@ -94,6 +94,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(UserPresent(userId!));
       },
     );
+
+    // final firebaseAuth = FirebaseAuth.instance.currentUser;
+    // if(firebaseAuth != null){
+    //   print("user present.................");
+    //   emit(AuthSignedIn(firebaseAuth));
+    // }
+    // else{
+    //   print("user not present.................");
+    //   emit(AuthInitial());
+    // }
   }
 
 

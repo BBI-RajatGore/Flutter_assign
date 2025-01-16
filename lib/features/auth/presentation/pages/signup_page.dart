@@ -12,12 +12,21 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +39,15 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthFailure) {
+          if(state is AuthLoading) {
+            showDialog(
+              context: context,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          else if (state is AuthFailure) {
             _showErrorDialog(context, state.message);
           } else if (state is AuthSignedIn) {
             Navigator.pushReplacementNamed(context, '/profile-form');
@@ -197,15 +214,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthLoading) {
-                    return const CircularProgressIndicator();
-                  } 
-                  return Container();
-                },
               ),
             ],
           ),
