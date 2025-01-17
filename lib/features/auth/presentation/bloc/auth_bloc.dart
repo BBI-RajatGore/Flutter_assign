@@ -5,6 +5,7 @@ import 'package:ecommerce_app/features/auth/domain/usecase/signout_usecase.dart'
 import 'package:ecommerce_app/features/auth/domain/usecase/signup_with_email_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
@@ -90,8 +91,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthInitial());
       },
       (userId){ 
-        print("This is user id from local: $userId");
-        emit(UserPresent(userId!));
+        final user = FirebaseAuth.instance.currentUser;
+
+        emit(AuthSignedIn(user!));
       },
     );
 

@@ -18,6 +18,8 @@ class ProfileErrorState extends ProfileState {
   ProfileErrorState(this.message);
 }
 
-class ProfileStatusCompleteState extends ProfileState {}
+class ProfileStatusCompleteState extends ProfileState {
+
+}
 
 class ProfileStatusIncompleteState extends ProfileState {}

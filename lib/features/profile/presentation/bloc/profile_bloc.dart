@@ -23,15 +23,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<SaveProfileEvent>(_onSaveProfile);
     on<UpdateProfileEvent>(_onUpdateProfile);
     on<GetProfileEvent>(_onGetProfile);
-    on<CheckProfileStatusEvent>(_onCheckProfileStatus);
+    // on<GetProfileForProfilePage>(_onGetProfileForProfilePage);
+    // on<CheckProfileStatusEvent>(_onCheckProfileStatus);
   }
 
   Future<void> _onSaveProfile(SaveProfileEvent event, Emitter<ProfileState> emit) async {
     emit(ProfileLoadingState());
     final result = await saveProfileUseCase.call(event.profileModel, event.userId);
     result.fold(
-      (failure) => emit(ProfileErrorState(failure.message)),
-      (_) => emit(ProfileSuccessState(event.profileModel)),
+      (failure) { 
+        emit(ProfileErrorState(failure.message));
+      },
+      (_) {
+         emit(ProfileStatusCompleteState());
+      },
     );
   }
 
@@ -46,29 +51,52 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   Future<void> _onGetProfile(GetProfileEvent event, Emitter<ProfileState> emit) async {
     emit(ProfileLoadingState());
-    final result = await getProfileUsecase.call(event.userId);
-    result.fold(
-      (failure) => emit(ProfileErrorState(failure.message)),
-      (profileModel) => emit(ProfileSuccessState(profileModel)),
-    );
-  }
-
-  Future<void> _onCheckProfileStatus(CheckProfileStatusEvent event, Emitter<ProfileState> emit) async {
-    // emit(ProfileLoadingState());
     final firebaseAuth = FirebaseAuth.instance;
     final userId = firebaseAuth.currentUser!.uid;
 
-    final result = await checkProfileStatusUsecase.call(userId);
+    final result = await getProfileUsecase.call(userId);
+
     result.fold(
-      (failure) => emit(ProfileErrorState(failure.message)),
-      (isProfileComplete) {
-        print("here in check ${isProfileComplete}");
-        if (isProfileComplete) {
+      (failure) {
+        print("........................");
+         emit(ProfileErrorState(failure.message));
+      },
+      (profileModel){
+        if(!profileModel.isEmpty){
           emit(ProfileStatusCompleteState());
-        } else {
-          emit(ProfileStatusIncompleteState());
+        }
+        else{
+           emit(ProfileSuccessState(profileModel));
         }
       },
     );
   }
+
+  // Future<void> _onGetProfileForProfilePage(GetProfileForProfilePage event, Emitter<ProfileState> emit) async {
+  //   emit(ProfileLoadingState());
+  //   final result = await getProfileUsecase.call(event.userId);
+  //   result.fold(
+  //     (failure) => emit(ProfileErrorState(failure.message)),
+  //     (profileModel) => emit(ProfileSuccessState(profileModel)),
+  //   );
+  // }
+
+  // Future<void> _onCheckProfileStatus(CheckProfileStatusEvent event, Emitter<ProfileState> emit) async {
+  //   // emit(ProfileLoadingState());
+  //   final firebaseAuth = FirebaseAuth.instance;
+  //   final userId = firebaseAuth.currentUser!.uid;
+
+  //   final result = await checkProfileStatusUsecase.call(userId);
+  //   result.fold(
+  //     (failure) => emit(ProfileErrorState(failure.message)),
+  //     (isProfileComplete) {
+  //       print("here in check profile ${isProfileComplete}");
+  //       if (isProfileComplete) {
+  //         emit(ProfileStatusCompleteState());
+  //       } else {
+  //         emit(ProfileStatusIncompleteState());
+  //       }
+  //     },
+  //   );
+  // }
 }

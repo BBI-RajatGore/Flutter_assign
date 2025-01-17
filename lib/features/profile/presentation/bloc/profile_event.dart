@@ -16,10 +16,13 @@ class UpdateProfileEvent extends ProfileEvent {
   UpdateProfileEvent(this.profileModel, this.userId);
 }
 
-class GetProfileEvent extends ProfileEvent {
-  final String userId;
-
-  GetProfileEvent(this.userId);
-}
+class GetProfileEvent extends ProfileEvent {}
 
 class CheckProfileStatusEvent extends ProfileEvent {}
+
+
+// class GetProfileForProfilePage extends  ProfileEvent {
+//   final String userId;
+
+//   GetProfileForProfilePage(this.userId);
+// }

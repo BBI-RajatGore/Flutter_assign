@@ -8,16 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfileForm extends StatefulWidget {
+
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfileFormState createState() => _ProfileFormState();
+
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  
+class _ProfileFormState extends State<ProfileForm> {
+
   final User? user = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
-  var _usernameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   File? _profileImage;
@@ -31,11 +33,18 @@ class _ProfilePageState extends State<ProfilePage> {
       _usernameController.text = user!.email!.split('@')[0];
     }
 
-    // if (user != null) {
-    //   BlocProvider.of<ProfileBloc>(context).add(
-    //     CheckProfileStatusEvent(user!.uid),
-    //   );
-    // }
+    final profileState = BlocProvider.of<ProfileBloc>(context).state;
+
+
+    if (profileState is ProfileSuccessState) {
+
+      if(profileState.profileModel.username != ""){
+        _usernameController.text = profileState.profileModel.username;
+      }
+      _phoneController.text = profileState.profileModel.phoneNumber;
+      _addressController.text = profileState.profileModel.address;
+    }
+
   }
 
   @override
@@ -48,110 +57,100 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ProfileBloc, ProfileState>(
-      listener: (context, state) {
-        if (state is ProfileStatusCompleteState) {
-          // Navigate directly to the home screen if the profile is complete
-          // Navigator.pushReplacementNamed(context, '/home');
-        } else if (state is ProfileStatusIncompleteState) {
-          // Stay on the profile form if the profile is incomplete
-          // No action needed, just remain on the current screen
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text(
-            'Complete Profile',
-            style: TextStyle(
-              color: Colors.teal,
-              fontWeight: FontWeight.w600,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'Complete Profile',
+          style: TextStyle(
+            color: Colors.teal,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _skipProfile,
+            child: const Text(
+              'Skip',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
             ),
           ),
-          backgroundColor: Colors.white,
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _buildProfileImageSection(),
-                const SizedBox(height: 24),
-                _buildTextField(
-                  controller: _usernameController,
-                  labelText: 'Username',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
-                    }
-                    return null;
-                  },
-                  icon: Icons.person,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _phoneController,
-                  labelText: 'Phone Number',
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    } else if (value.length < 10) {
-                      return 'Please enter a valid phone number';
-                    }
-                    return null;
-                  },
-                  icon: Icons.phone,
-                ),
-                const SizedBox(height: 16),
-                _buildTextField(
-                  controller: _addressController,
-                  labelText: 'Shipping Address',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your shipping address';
-                    }
-                    return null;
-                  },
-                  icon: Icons.location_on,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _saveProfile,
-                  style: ElevatedButton.styleFrom(
-                    elevation: 10,
-                    backgroundColor: Colors.teal,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: const Size(double.infinity, 50),
+        ],
+        backgroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildProfileImageSection(),
+              const SizedBox(height: 24),
+              _buildTextField(
+                controller: _usernameController,
+                labelText: 'Username',
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.trim()=="") {
+                    return 'Please enter your username';
+                  }
+                  return null;
+                },
+                icon: Icons.person,
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _phoneController,
+                labelText: 'Phone Number',
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.trim()==""  || value.startsWith("0")) {
+                    return 'Please enter your phone number';
+                  } else if (value.length != 10) {
+                    return 'Please enter a valid phone number';
+                  }
+                  return null;
+                },
+                icon: Icons.phone,
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _addressController,
+                labelText: 'Shipping Address',
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.trim()=="") {
+                    return 'Please enter your shipping address';
+                  }
+                  return null;
+                },
+                icon: Icons.location_on,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  elevation: 10,
+                  backgroundColor: Colors.teal,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Save Profile',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  minimumSize: const Size(double.infinity, 50),
                 ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: _skipProfile,
-                  child: const Text(
-                    'Skip Profile',
-                    style: TextStyle(
-                      color: Colors.teal,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                child: const Text(
+                  'Save Profile',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
@@ -167,9 +166,8 @@ class _ProfilePageState extends State<ProfilePage> {
           CircleAvatar(
             radius: 60,
             backgroundColor: Colors.grey.shade300,
-            backgroundImage: _profileImage != null
-                ? FileImage(_profileImage!)
-                : const AssetImage('assets/images/img1.png') as ImageProvider,
+            backgroundImage:
+                _profileImage != null ? FileImage(_profileImage!) : null,
             child: _profileImage == null
                 ? const Icon(Icons.camera_alt, color: Colors.teal, size: 30)
                 : null,
@@ -271,45 +269,80 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _saveProfile() {
+
     if (_formKey.currentState!.validate()) {
-      print("saving pprodile...............");
       BlocProvider.of<ProfileBloc>(context).add(
-       SaveProfileEvent(
+        SaveProfileEvent(
           ProfileModel(
-            username: _usernameController.text,
-            phoneNumber: _phoneController.text,
-            address: _addressController.text,
-            imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4YreOWfDX3kK-QLAbAL4ufCPc84ol2MA8Xg&s",
+            username: _usernameController.text.trim(),
+            phoneNumber: _phoneController.text.trim(),
+            address: _addressController.text.trim(),
+            imageUrl:
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4YreOWfDX3kK-QLAbAL4ufCPc84ol2MA8Xg&s",
           ),
           user!.uid,
         ),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile Saved!')),
-      );
+      SnackBar(
+        content: Text(
+          'Welcome ${_usernameController.text.trim()}',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.teal,
+      ),
+    );
 
-      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
   void _skipProfile() {
-    BlocProvider.of<ProfileBloc>(context).add(
-      SaveProfileEvent(
-        ProfileModel(
-          username: user!.email!.split('@')[0],
-          phoneNumber: '',
-          address: '',
-          imageUrl: '',
+    final profileState = BlocProvider.of<ProfileBloc>(context).state;
+
+    String? username;
+
+    if (profileState is ProfileSuccessState) {
+
+      username = profileState.profileModel.username ?? user!.email!.split('@')[0];
+
+      BlocProvider.of<ProfileBloc>(context).add(
+        SaveProfileEvent(
+          ProfileModel(
+            username: username,
+            phoneNumber: profileState.profileModel.phoneNumber ?? '',
+            address: profileState.profileModel.address ?? '',
+            imageUrl: profileState.profileModel.imageUrl ?? '',
+          ),
+          user!.uid,
         ),
-        user!.uid,
+      );
+    } else {
+
+      username = user!.email!.split('@')[0];
+
+      BlocProvider.of<ProfileBloc>(context).add(
+        SaveProfileEvent(
+          ProfileModel(
+            username: user!.email!.split('@')[0],
+            phoneNumber: '',
+            address: '',
+            imageUrl: '',
+          ),
+          user!.uid,
+        ),
+      );
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Welcome ${username}',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.teal,
       ),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile Saved!')),
-    );
-
-    Navigator.pushReplacementNamed(context, '/home');
   }
 }

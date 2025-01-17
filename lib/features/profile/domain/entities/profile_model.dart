@@ -28,4 +28,8 @@ class ProfileModel {
       address: json['address'],
     );
   }
+
+
+  bool get isEmpty =>  username.isEmpty || phoneNumber.isEmpty || address.isEmpty;
+
 }
