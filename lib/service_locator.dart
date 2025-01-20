@@ -3,6 +3,7 @@ import 'package:ecommerce_app/features/auth/data/datasource/local_datasource.dar
 import 'package:ecommerce_app/features/auth/data/datasource/remote_datasource.dart';
 import 'package:ecommerce_app/features/auth/data/repositories/respositories_impl.dart';
 import 'package:ecommerce_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:ecommerce_app/features/auth/domain/usecase/forgot_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/get_uid_from_local_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_email_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_google_usecase.dart';
@@ -24,7 +25,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 final getIt = GetIt.instance;
 
 Future<void> serviceLocator() async {
-
   // auth feature
   final sharedPreferences = await SharedPreferences.getInstance();
 
@@ -72,6 +72,11 @@ Future<void> serviceLocator() async {
       getIt(),
     ),
   );
+  getIt.registerLazySingleton<ForgotPasswordUsecase>(
+    () => ForgotPasswordUsecase(
+      getIt(),
+    ),
+  );
 
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -80,14 +85,14 @@ Future<void> serviceLocator() async {
       signInWithGoogle: getIt(),
       signOut: getIt(),
       getUidFromLocalDataSource: getIt(),
+      forgotPassword: getIt(),
     ),
   );
 
-
-
   // profile feature
 
-  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);  
+  getIt.registerLazySingleton<FirebaseFirestore>(
+      () => FirebaseFirestore.instance);
 
   getIt.registerLazySingleton<ProfileRemoteDataSource>(
     () => ProfileRemoteDataSourceImpl(
@@ -122,7 +127,6 @@ Future<void> serviceLocator() async {
     ),
   );
 
-
   getIt.registerFactory<ProfileBloc>(
     () => ProfileBloc(
       saveProfileUseCase: getIt(),
@@ -131,9 +135,4 @@ Future<void> serviceLocator() async {
       checkProfileStatusUsecase: getIt(),
     ),
   );
-
-
-
-
-
 }

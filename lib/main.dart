@@ -2,7 +2,7 @@ import 'package:ecommerce_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:ecommerce_app/features/product/presentation/pages/cart_page.dart';
 import 'package:ecommerce_app/features/product/presentation/pages/wishlist_page.dart';
 import 'package:ecommerce_app/features/product/presentation/pages/product_page.dart';
-import 'package:ecommerce_app/features/product/presentation/pages/profile_page.dart';
+import 'package:ecommerce_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -17,7 +17,9 @@ import 'package:ecommerce_app/firebase_options.dart';
 import 'package:ecommerce_app/service_locator.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   serviceLocator();
@@ -39,7 +41,10 @@ class MyApp extends StatelessWidget {
               getIt<AuthBloc>()..add(GetCurrentUserIdFromLocalEvent()),
         ),
         BlocProvider<ProfileBloc>(
-          create: (context) => getIt<ProfileBloc>()..add(GetProfileEvent(),),
+          create: (context) => getIt<ProfileBloc>()
+            ..add(
+              GetProfileEvent(),
+            ),
         ),
       ],
       child: MaterialApp(
@@ -49,8 +54,17 @@ class MyApp extends StatelessWidget {
           '/': (context) => AuthStateWrapper(),
           '/login': (context) => LoginPage(),
           '/signup': (context) => SignUpPage(),
-          '/profile-form': (context) => ProfileForm(),
-          '/bottom-nav': (context) =>  BottomNavigationPage(),
+          '/bottom-nav': (context) => BottomNavigationPage(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/profile-form') {
+            final isEdit = settings.arguments as bool;
+            if (isEdit) {
+              return MaterialPageRoute(
+                builder: (context) => ProfileForm(isEdit: isEdit),
+              );
+            }
+          }
         },
       ),
     );
@@ -62,27 +76,44 @@ class AuthStateWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
+
         if (state is AuthLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         } else if (state is AuthSignedIn) {
+
+          BlocProvider.of<ProfileBloc>(context).getProfile();
+
           return BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, profileState) {
-              if (profileState is ProfileStatusCompleteState) {
-                return  BottomNavigationPage();
-              } else if (profileState is ProfileInitialState || profileState is ProfileLoadingState) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator(),),
-                );
-              }  else {
 
-                print("nowwwww ${profileState}");
-                return ProfileForm();
+              print("state in main is ${profileState}");
+
+              if(profileState is ProfileSetupComplete){
+                return BottomNavigationPage();
+              }
+              else if (profileState is ProfileStatusCompleteState) {
+                return BottomNavigationPage();
+              } else if (profileState is ProfileInitialState ||
+                  profileState is ProfileLoadingState) {
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              } else if(profileState is ProfileStatusIncompleteState){
+                return ProfileForm(
+                  isEdit: false,
+                );
+              } else {
+                return ProfileForm(
+                  isEdit: false,
+                );
               }
             },
           );
-        } else if(state is AuthFailure){
+        } else if (state is AuthFailure) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error: ${state.message}')),
@@ -97,17 +128,13 @@ class AuthStateWrapper extends StatelessWidget {
   }
 }
 
-
-
 class BottomNavigationPage extends StatefulWidget {
   @override
   _BottomNavigationPageState createState() => _BottomNavigationPageState();
 }
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
-
   int _selectedIndex = 0;
-
 
   final List<Widget> _pages = [
     ProductPage(),
@@ -116,7 +143,6 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
     // ProductProfilePage(),
     ProfilePage()
   ];
-
 
   void _onItemTapped(int index) {
     setState(() {
@@ -132,7 +158,6 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
         child: _pages[_selectedIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        
         backgroundColor: Colors.teal.shade50,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

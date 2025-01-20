@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/features/auth/domain/usecase/forgot_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/get_uid_from_local_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_email_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_google_usecase.dart';
@@ -15,19 +16,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInWithGoogle signInWithGoogle;
   final SignOut signOut;
   final GetUidFromLocalDataSource getUidFromLocalDataSource;
+  final ForgotPasswordUsecase forgotPassword;
 
   AuthBloc({
     required this.signUpWithEmailPassword,
     required this.signInWithEmailPassword,
     required this.signInWithGoogle,
     required this.signOut,
-    required this.getUidFromLocalDataSource
+    required this.getUidFromLocalDataSource,
+    required this.forgotPassword,
+
   }) : super(AuthInitial()) {
     on<SignUpEvent>(_onSignUp);
     on<SignInEvent>(_onSignIn);
     on<SignInWithGoogleEvent>(_onSignInWithGoogle);
     on<SignOutEvent>(_onSignOut);
     on<GetCurrentUserIdFromLocalEvent>(_onGetCurrentUserIdFromLocal);
+    on<ForgotPasswordEvent>(_forgotPassword);
   }
 
 
@@ -38,7 +43,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
       (user) {
-        print("This is user signup : ${user!.uid}" );
         emit(AuthSignedIn(user!));
       },
     );
@@ -52,7 +56,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
        (user) {
-        print("This is user signin: ${user!.uid}" );
         emit(AuthSignedIn(user!));
       },
     );
@@ -65,7 +68,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
       (user) {
-        print("This is user signin with google: ${user!.photoURL}" );
         emit(AuthSignedIn(user!));
       },
     );
@@ -83,11 +85,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onGetCurrentUserIdFromLocal(
       GetCurrentUserIdFromLocalEvent event, Emitter<AuthState> emit) async {
-        print("getting uid from local");
+
     final result = await getUidFromLocalDataSource.call();
     result.fold(
       (failure){
-        print("error while getting uid");
         emit(AuthInitial());
       },
       (userId){ 
@@ -96,18 +97,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthSignedIn(user!));
       },
     );
-
-    // final firebaseAuth = FirebaseAuth.instance.currentUser;
-    // if(firebaseAuth != null){
-    //   print("user present.................");
-    //   emit(AuthSignedIn(firebaseAuth));
-    // }
-    // else{
-    //   print("user not present.................");
-    //   emit(AuthInitial());
-    // }
   }
 
+  Future<void> _forgotPassword(ForgotPasswordEvent event,Emitter<AuthState> emit) async{
 
+    final result =  await forgotPassword.call(event.email);
+
+    result.fold(
+      (failure){
+        print("failed while reseting password");
+      },
+      (userId){ 
+        print("password reset success");
+      },
+    );
+
+
+  }
 
 }

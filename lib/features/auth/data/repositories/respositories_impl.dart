@@ -49,5 +49,10 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(Failure(e.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) {
+      return authRemoteDataSource.forgotPassword(email);
+  }
 
 }

@@ -17,3 +17,10 @@ class SignInWithGoogleEvent extends AuthEvent {}
 class SignOutEvent extends AuthEvent {}
 
 class GetCurrentUserIdFromLocalEvent extends AuthEvent {}
+
+
+class ForgotPasswordEvent extends AuthEvent{
+  String email;
+
+  ForgotPasswordEvent({required this.email});
+}

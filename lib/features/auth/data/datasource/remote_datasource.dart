@@ -9,6 +9,7 @@ abstract class AuthRemoteDataSource {
   Future<Either<Failure, User?>> signInWithEmailPassword(AuthModel authModel);
   Future<Either<Failure, User?>> signInWithGoogle();
   Future<Either<Failure, void>> signOut();
+  Future<Either<Failure,void>> forgotPassword(String email);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -93,6 +94,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return Right(null);
     } catch (e) {
       return Left(Failure("Error signing out"));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    try{
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return const Right(null);
+    }
+    catch(e){
+
+      print("error in reseting password ${e}");
+
+      return Left(Failure("Error while reseting password"));
     }
   }
 }

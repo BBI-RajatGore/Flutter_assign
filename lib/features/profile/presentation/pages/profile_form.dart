@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
@@ -9,42 +10,61 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileForm extends StatefulWidget {
+  final bool isEdit;
+  ProfileForm({required this.isEdit});
 
   @override
   _ProfileFormState createState() => _ProfileFormState();
-
 }
 
 class _ProfileFormState extends State<ProfileForm> {
-
   final User? user = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
-  File? _profileImage;
+  String selectedImageUrl = "";
   final ImagePicker _picker = ImagePicker();
+
+  final List<String> imageUrls = [
+    'https://sketchok.com/images/articles/06-anime/002-one-piece/26/16.jpg',
+    'https://imgcdn.stablediffusionweb.com/2024/9/14/fb1914b4-e462-4741-b25d-6e55eeeacd0c.jpg',
+    'https://preview.redd.it/my-boa-hancock-attempt-v0-30ze1pt9g58c1.png?width=1280&format=png&auto=webp&s=31933400f61edfcd2007e6949af56e24d0522c07',
+    'https://imgcdn.stablediffusionweb.com/2024/10/7/16f5e32e-0833-425f-9c2a-6c07aae8c5ee.jpg',
+    'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/040dc617-5ca2-49ad-9518-65fd6ac1e816/anim=false,width=450/00218-2389552877.jpeg',
+    'https://i.pinimg.com/564x/78/fc/26/78fc26efc924e11c992afcf80c966a0f.jpg',
+    'https://wallpapers.com/images/hd/anime-girl-profile-pictures-kr6trv4dmtrqrbez.jpg',
+    'https://img.freepik.com/free-vector/young-man-with-glasses-avatar_1308-175763.jpg?t=st=1737359102~exp=1737362702~hmac=cf0e40c06d9f4e9c6ea250b792651bbde1673760167ac5215a93c7f85264f3e5&w=740',
+    
+  ];
 
   @override
   void initState() {
     super.initState();
-
     if (user != null && user!.email != null) {
       _usernameController.text = user!.email!.split('@')[0];
     }
 
     final profileState = BlocProvider.of<ProfileBloc>(context).state;
-
-
     if (profileState is ProfileSuccessState) {
-
-      if(profileState.profileModel.username != ""){
+      if (profileState.profileModel.username != "") {
         _usernameController.text = profileState.profileModel.username;
       }
       _phoneController.text = profileState.profileModel.phoneNumber;
       _addressController.text = profileState.profileModel.address;
-    }
+      selectedImageUrl = profileState.profileModel.imageUrl; 
+    } else {
+      
+      final profileBloc = context.read<ProfileBloc>();
+      final profileModel = profileBloc.profileModel;
 
+      if (profileModel.username != "") {
+        _usernameController.text = profileModel.username;
+      }
+      _phoneController.text = profileModel.phoneNumber;
+      _addressController.text = profileModel.address;
+      selectedImageUrl = profileModel.imageUrl;  
+    }
   }
 
   @override
@@ -60,7 +80,6 @@ class _ProfileFormState extends State<ProfileForm> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: const Text(
           'Complete Profile',
           style: TextStyle(
@@ -69,16 +88,18 @@ class _ProfileFormState extends State<ProfileForm> {
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: _skipProfile,
-            child: const Text(
-              'Skip',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-          ),
+          (widget.isEdit)
+              ? Container()
+              : TextButton(
+                  onPressed: _skipProfile,
+                  child: const Text(
+                    'Skip',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
         ],
         backgroundColor: Colors.white,
       ),
@@ -94,7 +115,7 @@ class _ProfileFormState extends State<ProfileForm> {
                 controller: _usernameController,
                 labelText: 'Username',
                 validator: (value) {
-                  if (value == null || value.isEmpty || value.trim()=="") {
+                  if (value == null || value.isEmpty || value.trim() == "") {
                     return 'Please enter your username';
                   }
                   return null;
@@ -107,7 +128,10 @@ class _ProfileFormState extends State<ProfileForm> {
                 labelText: 'Phone Number',
                 keyboardType: TextInputType.phone,
                 validator: (value) {
-                  if (value == null || value.isEmpty || value.trim()==""  || value.startsWith("0")) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim() == "" ||
+                      value.startsWith("0")) {
                     return 'Please enter your phone number';
                   } else if (value.length != 10) {
                     return 'Please enter a valid phone number';
@@ -121,7 +145,7 @@ class _ProfileFormState extends State<ProfileForm> {
                 controller: _addressController,
                 labelText: 'Shipping Address',
                 validator: (value) {
-                  if (value == null || value.isEmpty || value.trim()=="") {
+                  if (value == null || value.isEmpty || value.trim() == "") {
                     return 'Please enter your shipping address';
                   }
                   return null;
@@ -130,7 +154,7 @@ class _ProfileFormState extends State<ProfileForm> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _saveProfile,
+                onPressed: (widget.isEdit) ? _updateProfile : _saveProfile,
                 style: ElevatedButton.styleFrom(
                   elevation: 10,
                   backgroundColor: Colors.teal,
@@ -140,9 +164,9 @@ class _ProfileFormState extends State<ProfileForm> {
                   ),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text(
-                  'Save Profile',
-                  style: TextStyle(
+                child: Text(
+                  (widget.isEdit) ? 'Update Profile' : 'Save Profile',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -167,8 +191,8 @@ class _ProfileFormState extends State<ProfileForm> {
             radius: 60,
             backgroundColor: Colors.grey.shade300,
             backgroundImage:
-                _profileImage != null ? FileImage(_profileImage!) : null,
-            child: _profileImage == null
+                selectedImageUrl.isNotEmpty ? NetworkImage(selectedImageUrl) : null,
+            child: selectedImageUrl.isEmpty
                 ? const Icon(Icons.camera_alt, color: Colors.teal, size: 30)
                 : null,
           ),
@@ -189,41 +213,44 @@ class _ProfileFormState extends State<ProfileForm> {
     );
   }
 
-  Future<void> _chooseProfileImage() async {
-    final ImageSource? source = await showDialog<ImageSource>(
-      context: context,
-      builder: (context) => SimpleDialog(
-        title: const Text('Select Profile Image'),
-        children: [
-          SimpleDialogOption(
-            onPressed: () {
-              Navigator.pop(context, ImageSource.camera);
-            },
-            child: const Text('Take a Photo',
-                style:
-                    TextStyle(color: Colors.teal, fontWeight: FontWeight.w500)),
+Future<void> _chooseProfileImage() async {
+  final String? selectedImageUrl = await showDialog<String>(
+    context: context,
+    builder: (context) => SimpleDialog(
+      title: const Text('Select Profile Image',style: TextStyle(color: Colors.teal),),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          child: Wrap(
+            spacing: 16.0,  
+            runSpacing: 16.0,  
+            alignment: WrapAlignment.spaceAround,
+            children: imageUrls
+                .map(
+                  (url) => GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context, url);
+                    },
+                    child: CircleAvatar(
+                      radius: 30,  
+                      backgroundImage: NetworkImage(url),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
-          SimpleDialogOption(
-            onPressed: () {
-              Navigator.pop(context, ImageSource.gallery);
-            },
-            child: const Text('Choose from Gallery',
-                style:
-                    TextStyle(color: Colors.teal, fontWeight: FontWeight.w500)),
-          ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 
-    if (source != null) {
-      final XFile? image = await _picker.pickImage(source: source);
-      if (image != null) {
-        setState(() {
-          _profileImage = File(image.path);
-        });
-      }
-    }
+  if (selectedImageUrl != null) {
+    setState(() {
+      this.selectedImageUrl = selectedImageUrl;
+    });
   }
+}
+
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -269,7 +296,6 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 
   void _saveProfile() {
-
     if (_formKey.currentState!.validate()) {
       BlocProvider.of<ProfileBloc>(context).add(
         SaveProfileEvent(
@@ -277,23 +303,49 @@ class _ProfileFormState extends State<ProfileForm> {
             username: _usernameController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             address: _addressController.text.trim(),
-            imageUrl:
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4YreOWfDX3kK-QLAbAL4ufCPc84ol2MA8Xg&s",
+            imageUrl: selectedImageUrl, 
           ),
           user!.uid,
         ),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Welcome ${_usernameController.text.trim()}',
-          style: const TextStyle(color: Colors.white),
+        SnackBar(
+          content: Text(
+            'Welcome ${_usernameController.text.trim()}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.teal,
         ),
-        backgroundColor: Colors.teal,
-      ),
-    );
+      );
+    }
+  }
 
+  void _updateProfile() {
+    if (_formKey.currentState!.validate()) {
+      BlocProvider.of<ProfileBloc>(context).add(
+        UpdateProfileEvent(
+          ProfileModel(
+            username: _usernameController.text.trim(),
+            phoneNumber: _phoneController.text.trim(),
+            address: _addressController.text.trim(),
+            imageUrl: selectedImageUrl,  
+          ),
+          user!.uid,
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Profile updated successfully',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.teal,
+        ),
+      );
+
+      Navigator.pop(context);
     }
   }
 
@@ -302,9 +354,9 @@ class _ProfileFormState extends State<ProfileForm> {
 
     String? username;
 
-    if (profileState is ProfileSuccessState) {
-
-      username = profileState.profileModel.username ?? user!.email!.split('@')[0];
+    if (profileState is ProfileStatusIncompleteState) {
+      username =
+          profileState.profileModel.username ?? user!.email!.split('@')[0];
 
       BlocProvider.of<ProfileBloc>(context).add(
         SaveProfileEvent(
@@ -317,8 +369,9 @@ class _ProfileFormState extends State<ProfileForm> {
           user!.uid,
         ),
       );
-    } else {
 
+
+    } else {
       username = user!.email!.split('@')[0];
 
       BlocProvider.of<ProfileBloc>(context).add(
@@ -332,17 +385,17 @@ class _ProfileFormState extends State<ProfileForm> {
           user!.uid,
         ),
       );
+
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           'Welcome ${username}',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.teal,
       ),
     );
-
   }
 }

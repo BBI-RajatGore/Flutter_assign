@@ -11,6 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -97,6 +98,36 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       onPressed: _togglePasswordVisibility,
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (_emailController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please enter your email.'),
+                              ),
+                            );
+                          } else {
+                            BlocProvider.of<AuthBloc>(context).add(
+                              ForgotPasswordEvent(
+                                email: _emailController.text.trim(),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text(
+                          "Forgot Password",
+                          style: TextStyle(
+                            color: Colors.teal,
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(

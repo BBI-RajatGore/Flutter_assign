@@ -22,4 +22,20 @@ class ProfileStatusCompleteState extends ProfileState {
 
 }
 
-class ProfileStatusIncompleteState extends ProfileState {}
+class ProfileStatusIncompleteState extends ProfileState {
+  final ProfileModel profileModel;
+
+  ProfileStatusIncompleteState(this.profileModel);
+}
+
+
+class ProfileUpdatedSuccess extends ProfileState {
+  final ProfileModel profileModel;
+
+  ProfileUpdatedSuccess(this.profileModel);
+}
+
+
+class ProfileSetupComplete extends ProfileState{
+
+}
