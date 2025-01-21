@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/core/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
@@ -11,7 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -28,22 +28,12 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Login',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 30),
         child: Column(
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
+              padding: EdgeInsets.symmetric(vertical: 80),
               child: Text(
                 'Welcome Back!',
                 style: TextStyle(
@@ -106,17 +96,17 @@ class _LoginPageState extends State<LoginPage> {
                       GestureDetector(
                         onTap: () {
                           if (_emailController.text.trim().isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please enter your email.'),
-                              ),
-                            );
+                            Constants.showErrorSnackBar(
+                                context, "Please enter email");
                           } else {
                             BlocProvider.of<AuthBloc>(context).add(
                               ForgotPasswordEvent(
                                 email: _emailController.text.trim(),
                               ),
                             );
+
+                            Constants.showSuccessSnackBar(
+                                context, "Reset linked sent to your email");
                           }
                         },
                         child: const Text(

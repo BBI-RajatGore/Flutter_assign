@@ -13,12 +13,9 @@ abstract class ProfileRemoteDataSource {
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   
-
-  // final FirebaseStorage _firebaseStorage;
   final FirebaseFirestore _firebaseFirestore;
 
   ProfileRemoteDataSourceImpl(
-    // this._firebaseStorage,
     this._firebaseFirestore,
   );  
 
@@ -70,12 +67,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     try {
       String? imageUrl;
 
-
-      // if (imagePath != null) {
-      //   imageUrl = await _uploadImageToFirebaseStorage(imagePath, userId);
-      // }
-
-
       await _firebaseFirestore.collection('profiles').doc(userId).set({
         'username': profileModel.username,
         'phoneNumber': profileModel.phoneNumber,
@@ -96,7 +87,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       DocumentSnapshot snapshot = await _firebaseFirestore.collection('profiles').doc(userId).get();
 
       if (!snapshot.exists) {
-        return Right(false);
+        return const Right(false);
       }
 
       var profileData = snapshot.data() as Map<String, dynamic>;
@@ -111,25 +102,5 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       return Left(Failure('Error checking profile status: ${e.toString()}'));
     }
   }
-
-  // Future<String> _uploadImageToFirebaseStorage(File imagePath, String userId) async {
-  //   try {
-
-  //     Reference ref = _firebaseStorage.ref().child('profile_images/$userId.jpg');
-
-
-  //     UploadTask uploadTask = ref.putFile(imagePath);
-
-  //     TaskSnapshot snapshot = await uploadTask.whenComplete(() => {});
-
-
-  //     String imageUrl = await snapshot.ref.getDownloadURL();
-
-  //     return imageUrl;
-  //   } catch (e) {
-  //     throw Exception('Error uploading image: ${e.toString()}');
-  //   }
-  // }
-
   
 }

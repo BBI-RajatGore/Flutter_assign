@@ -11,10 +11,10 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -31,17 +31,12 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Sign Up', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 30),
         child: Column(
           children: [
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
+              padding: EdgeInsets.symmetric(vertical: 80),
               child: Text(
                 'Create an Account',
                 style: TextStyle(
@@ -60,24 +55,24 @@ class _SignUpPageState extends State<SignUpPage> {
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
                         return 'Please enter a valid email';
                       }
                       return null;
                     },
                     icon: Icons.email,
                   ),
-
                   const SizedBox(height: 16),
                   _buildTextField(
                     controller: passwordController,
                     labelText: 'Password',
                     obscureText: _obscurePassword,
                     validator: (value) {
-                      if (value == null || value.isEmpty ) {
+                      if (value == null || value.isEmpty) {
                         return 'Please enter your password';
-                      }
-                      else if(value.length < 6){
+                      } else if (value.length < 6) {
                         return 'Password must be at least 6 characters';
                       }
                       return null;
@@ -101,8 +96,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please confirm your password';
-                      }
-                      else if (value != passwordController.text) {
+                      } else if (value != passwordController.text) {
                         return 'Passwords do not match';
                       }
                       return null;
@@ -126,9 +120,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           email: emailController.text,
                           password: passwordController.text,
                         );
-                        context.read<AuthBloc>().add(SignUpEvent(authModel));
 
-                        Navigator.pushReplacementNamed(context, '/');
+                        Navigator.pop(context);
+                        BlocProvider.of<AuthBloc>(context)
+                            .add(SignUpEvent(authModel),);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -171,11 +166,13 @@ class _SignUpPageState extends State<SignUpPage> {
                     Buttons.google,
                     text: "Sign Up With Google",
                     onPressed: () {
+
+                      Navigator.pop(context);
+
                       BlocProvider.of<AuthBloc>(context).add(
                         SignInWithGoogleEvent(),
                       );
 
-                      Navigator.pushReplacementNamed(context, '/');
                     },
                   ),
                   const SizedBox(height: 40),
@@ -239,7 +236,7 @@ class _SignUpPageState extends State<SignUpPage> {
             const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const  BorderSide(color: Colors.teal, width: 1),
+          borderSide: const BorderSide(color: Colors.teal, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -262,30 +259,4 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Up Failed'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSuccessSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('User signed up successfully!'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
 }

@@ -10,6 +10,11 @@ import 'package:ecommerce_app/features/auth/domain/usecase/signin_with_google_us
 import 'package:ecommerce_app/features/auth/domain/usecase/signout_usecase.dart';
 import 'package:ecommerce_app/features/auth/domain/usecase/signup_with_email_password_usecase.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:ecommerce_app/features/product/data/datasource/remote_data_source.dart';
+import 'package:ecommerce_app/features/product/data/repositories/repository_imp.dart';
+import 'package:ecommerce_app/features/product/domain/repositories/repositories.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/get_products_usecase.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/profile/data/datasource/remote_data_source.dart';
 import 'package:ecommerce_app/features/profile/data/repositories/profile_repositories_impl.dart';
 import 'package:ecommerce_app/features/profile/domain/repositories/profile_repositories.dart';
@@ -21,6 +26,7 @@ import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.da
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 final getIt = GetIt.instance;
 
@@ -135,4 +141,35 @@ Future<void> serviceLocator() async {
       checkProfileStatusUsecase: getIt(),
     ),
   );
+
+  // product feature
+
+  getIt.registerLazySingleton(
+    () => http.Client(),
+  );
+
+  getIt.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<GetProductsUsecase>(
+    () => GetProductsUsecase(
+      getIt(),
+    ),
+  );
+
+  getIt.registerFactory<ProductBloc>(
+    () => ProductBloc(
+      getProductsUsecase: getIt(),
+    ),
+  );
+  
 }

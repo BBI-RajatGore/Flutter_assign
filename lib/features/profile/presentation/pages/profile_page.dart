@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/core/utils/constants.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
@@ -85,89 +86,73 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildShimmerLoading() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: const CircleAvatar(
-            radius: 60,
-            backgroundColor: Colors.white,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: const CircleAvatar(
+              radius: 60,
+              backgroundColor: Colors.white,
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
+          const SizedBox(height: 20),
 
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            width: 200,
-            height: 24,
-            color: Colors.white,
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: 200,
+              height: 24,
+              color: Colors.white,
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: _buildShimmerProfileInfo(),
-        ),
-        const SizedBox(height: 10),
-
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: _buildShimmerProfileInfo(),
-        ),
-        const SizedBox(height: 10),
-
-        // Shimmer for Logout (Profile Info Card)
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: _buildShimmerProfileInfo(),
-        ),
-      ],
+          _buildShimmerProfileInfo(),
+          const SizedBox(height: 10),
+          _buildShimmerProfileInfo(),
+          const SizedBox(height: 10),
+          _buildShimmerProfileInfo(),
+        ],
+      ),
     );
   }
 
   Widget _buildShimmerProfileInfo() {
-    return Card(
-      elevation: 2,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(
-          color: Colors.grey,
-          width: 1,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Card(
+        elevation: 2,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(
+            color: Colors.grey,
+            width: 1,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: const CircleAvatar(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              const CircleAvatar(
                 radius: 16,
                 backgroundColor: Colors.white,
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
+              const SizedBox(width: 10),
+              Expanded(
                 child: Container(
                   height: 16,
                   color: Colors.white,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -336,9 +321,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error logging out: $e')),
-      );
+      Constants.showErrorSnackBar(context, "Error while logging out");
     }
   }
 }
+

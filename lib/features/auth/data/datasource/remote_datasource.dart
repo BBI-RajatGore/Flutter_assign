@@ -9,58 +9,66 @@ abstract class AuthRemoteDataSource {
   Future<Either<Failure, User?>> signInWithEmailPassword(AuthModel authModel);
   Future<Either<Failure, User?>> signInWithGoogle();
   Future<Either<Failure, void>> signOut();
-  Future<Either<Failure,void>> forgotPassword(String email);
+  Future<Either<Failure, void>> forgotPassword(String email);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  
   final FirebaseAuth _firebaseAuth;
   final GoogleAuthProvider _googleAuthProvider;
-  final AuthLocalDataSource _authLocalDataSource; 
+  final AuthLocalDataSource _authLocalDataSource;
 
   AuthRemoteDataSourceImpl(
     this._firebaseAuth,
     this._googleAuthProvider,
-    this._authLocalDataSource, 
+    this._authLocalDataSource,
   );
 
   @override
-  Future<Either<Failure, User?>> signUpWithEmailPassword(AuthModel authModel) async {
+  Future<Either<Failure, User?>> signUpWithEmailPassword(
+      AuthModel authModel) async {
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: authModel.email,
         password: authModel.password,
       );
       final user = userCredential.user;
-      
 
       if (user != null) {
-        await _authLocalDataSource.saveUserId(user.uid);
+        await user.sendEmailVerification();
+        return Left(Failure("Please verify your email."));
+      } else {
+        return Left(Failure("Error signing up with email and password"));
       }
-
-      return Right(user);
     } catch (e) {
+      if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
+        return Left(Failure("The email address is already in use."));
+      }
       return Left(Failure("Error signing up with email and password"));
     }
   }
 
   @override
-  Future<Either<Failure, User?>> signInWithEmailPassword(AuthModel authModel) async {
+  Future<Either<Failure, User?>> signInWithEmailPassword(
+      AuthModel authModel) async {
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
         email: authModel.email,
         password: authModel.password,
       );
       final user = userCredential.user;
-      
 
       if (user != null) {
-        await _authLocalDataSource.saveUserId(user.uid);
+        if (user.emailVerified) {
+          await _authLocalDataSource.saveUserId(user.uid);
+          return Right(user);
+        } else {
+          return Left(Failure("Please verify your email address before proceeding."));
+        }
+      } else {
+        return Left(Failure("No user found with that email and password"));
       }
-
-      return Right(user);
     } catch (e) {
-      return Left(Failure("No user found with that email and password"));
+      return Left(Failure("An error occurred during sign-in: ${e.toString()}"));
     }
   }
 
@@ -78,7 +86,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       return Right(_firebaseAuth.currentUser!);
-
     } catch (e) {
       return Left(Failure("Error signing in with Google"));
     }
@@ -88,26 +95,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<Failure, void>> signOut() async {
     try {
       await _firebaseAuth.signOut();
-    
       await _authLocalDataSource.clearUserId();
-
-      return Right(null);
+      return const Right(null);
     } catch (e) {
       return Left(Failure("Error signing out"));
     }
   }
-  
+
   @override
   Future<Either<Failure, void>> forgotPassword(String email) async {
-    try{
+    try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       return const Right(null);
-    }
-    catch(e){
-
-      print("error in reseting password ${e}");
-
-      return Left(Failure("Error while reseting password"));
+    } catch (e) {
+      print("Error in resetting password: $e");
+      return Left(Failure("Error while resetting password"));
     }
   }
 }

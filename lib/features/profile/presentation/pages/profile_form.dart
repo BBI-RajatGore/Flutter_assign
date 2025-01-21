@@ -1,5 +1,4 @@
-
-import 'dart:io';
+import 'package:ecommerce_app/core/utils/constants.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_event.dart';
@@ -8,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ProfileForm extends StatefulWidget {
   final bool isEdit;
@@ -26,18 +27,6 @@ class _ProfileFormState extends State<ProfileForm> {
   String selectedImageUrl = "";
   final ImagePicker _picker = ImagePicker();
 
-  final List<String> imageUrls = [
-    'https://sketchok.com/images/articles/06-anime/002-one-piece/26/16.jpg',
-    'https://imgcdn.stablediffusionweb.com/2024/9/14/fb1914b4-e462-4741-b25d-6e55eeeacd0c.jpg',
-    'https://preview.redd.it/my-boa-hancock-attempt-v0-30ze1pt9g58c1.png?width=1280&format=png&auto=webp&s=31933400f61edfcd2007e6949af56e24d0522c07',
-    'https://imgcdn.stablediffusionweb.com/2024/10/7/16f5e32e-0833-425f-9c2a-6c07aae8c5ee.jpg',
-    'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/040dc617-5ca2-49ad-9518-65fd6ac1e816/anim=false,width=450/00218-2389552877.jpeg',
-    'https://i.pinimg.com/564x/78/fc/26/78fc26efc924e11c992afcf80c966a0f.jpg',
-    'https://wallpapers.com/images/hd/anime-girl-profile-pictures-kr6trv4dmtrqrbez.jpg',
-    'https://img.freepik.com/free-vector/young-man-with-glasses-avatar_1308-175763.jpg?t=st=1737359102~exp=1737362702~hmac=cf0e40c06d9f4e9c6ea250b792651bbde1673760167ac5215a93c7f85264f3e5&w=740',
-    
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -45,26 +34,15 @@ class _ProfileFormState extends State<ProfileForm> {
       _usernameController.text = user!.email!.split('@')[0];
     }
 
-    final profileState = BlocProvider.of<ProfileBloc>(context).state;
-    if (profileState is ProfileSuccessState) {
-      if (profileState.profileModel.username != "") {
-        _usernameController.text = profileState.profileModel.username;
-      }
-      _phoneController.text = profileState.profileModel.phoneNumber;
-      _addressController.text = profileState.profileModel.address;
-      selectedImageUrl = profileState.profileModel.imageUrl; 
-    } else {
-      
-      final profileBloc = context.read<ProfileBloc>();
-      final profileModel = profileBloc.profileModel;
+    final profileBloc = context.read<ProfileBloc>();
+    final profileModel = profileBloc.profileModel;
 
-      if (profileModel.username != "") {
-        _usernameController.text = profileModel.username;
-      }
-      _phoneController.text = profileModel.phoneNumber;
-      _addressController.text = profileModel.address;
-      selectedImageUrl = profileModel.imageUrl;  
+    if (profileModel.username != "") {
+      _usernameController.text = profileModel.username;
     }
+    _phoneController.text = profileModel.phoneNumber;
+    _addressController.text = profileModel.address;
+    selectedImageUrl = profileModel.imageUrl;
   }
 
   @override
@@ -80,9 +58,9 @@ class _ProfileFormState extends State<ProfileForm> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Complete Profile',
-          style: TextStyle(
+        title: Text(
+          (widget.isEdit) ? 'Update Profile' : 'Complete Profile',
+          style: const TextStyle(
             color: Colors.teal,
             fontWeight: FontWeight.w600,
           ),
@@ -190,8 +168,9 @@ class _ProfileFormState extends State<ProfileForm> {
           CircleAvatar(
             radius: 60,
             backgroundColor: Colors.grey.shade300,
-            backgroundImage:
-                selectedImageUrl.isNotEmpty ? NetworkImage(selectedImageUrl) : null,
+            backgroundImage: selectedImageUrl.isNotEmpty
+                ? NetworkImage(selectedImageUrl)
+                : null,
             child: selectedImageUrl.isEmpty
                 ? const Icon(Icons.camera_alt, color: Colors.teal, size: 30)
                 : null,
@@ -213,44 +192,46 @@ class _ProfileFormState extends State<ProfileForm> {
     );
   }
 
-Future<void> _chooseProfileImage() async {
-  final String? selectedImageUrl = await showDialog<String>(
-    context: context,
-    builder: (context) => SimpleDialog(
-      title: const Text('Select Profile Image',style: TextStyle(color: Colors.teal),),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          child: Wrap(
-            spacing: 16.0,  
-            runSpacing: 16.0,  
-            alignment: WrapAlignment.spaceAround,
-            children: imageUrls
-                .map(
-                  (url) => GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context, url);
-                    },
-                    child: CircleAvatar(
-                      radius: 30,  
-                      backgroundImage: NetworkImage(url),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+  Future<void> _chooseProfileImage() async {
+    final String? selectedImageUrl = await showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text(
+          'Select Profile Image',
+          style: TextStyle(color: Colors.teal),
         ),
-      ],
-    ),
-  );
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: Wrap(
+              spacing: 16.0,
+              runSpacing: 16.0,
+              alignment: WrapAlignment.spaceAround,
+              children: Constants.imageUrls
+                  .map(
+                    (url) => GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context, url);
+                      },
+                      child: CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(url),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
 
-  if (selectedImageUrl != null) {
-    setState(() {
-      this.selectedImageUrl = selectedImageUrl;
-    });
+    if (selectedImageUrl != null) {
+      setState(() {
+        this.selectedImageUrl = selectedImageUrl;
+      });
+    }
   }
-}
-
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -303,21 +284,20 @@ Future<void> _chooseProfileImage() async {
             username: _usernameController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             address: _addressController.text.trim(),
-            imageUrl: selectedImageUrl, 
+            imageUrl: selectedImageUrl,
           ),
           user!.uid,
         ),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Welcome ${_usernameController.text.trim()}',
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.teal,
-        ),
-      );
+      // showTopSnackBar(
+      //   displayDuration: const Duration(milliseconds: 3),
+      //   Overlay.of(context),
+      //   CustomSnackBar.success(
+      //     backgroundColor: Colors.teal,
+      //     message: 'Welcome ${_usernameController.text.trim()}',
+      //   ),
+      // );
     }
   }
 
@@ -329,19 +309,18 @@ Future<void> _chooseProfileImage() async {
             username: _usernameController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             address: _addressController.text.trim(),
-            imageUrl: selectedImageUrl,  
+            imageUrl: selectedImageUrl,
           ),
           user!.uid,
         ),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Profile updated successfully',
-            style: TextStyle(color: Colors.white),
-          ),
+      showTopSnackBar(
+        displayDuration: const Duration(milliseconds: 3),
+        Overlay.of(context),
+        const CustomSnackBar.success(
           backgroundColor: Colors.teal,
+          message: 'Profile updated successfully',
         ),
       );
 
@@ -369,8 +348,6 @@ Future<void> _chooseProfileImage() async {
           user!.uid,
         ),
       );
-
-
     } else {
       username = user!.email!.split('@')[0];
 
@@ -385,17 +362,15 @@ Future<void> _chooseProfileImage() async {
           user!.uid,
         ),
       );
-
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Welcome ${username}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.teal,
-      ),
-    );
+    // showTopSnackBar(
+    //   displayDuration: const Duration(milliseconds: 3),
+    //   Overlay.of(context),
+    //   CustomSnackBar.success(
+    //     backgroundColor: Colors.teal,
+    //     message: 'Welcome $username',
+    //   ),
+    // );
   }
 }
