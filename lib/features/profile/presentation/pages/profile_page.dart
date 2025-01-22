@@ -1,6 +1,7 @@
 import 'package:ecommerce_app/core/utils/constants.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_event.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_event.dart';
@@ -318,6 +319,8 @@ class _ProfilePageState extends State<ProfilePage> {
       BlocProvider.of<ProfileBloc>(context).add(ClearProfileModelEvent());
 
       BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
+
+      BlocProvider.of<ProductBloc>(context).add(ClearProductListEvent());
 
       Navigator.pop(context);
     } catch (e) {

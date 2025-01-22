@@ -20,4 +20,24 @@ class ProductRepositoryImpl implements ProductRepository {
       return Left(Failure(e.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, List<int>>> getFavouriteProductsId(String userId) async {
+    try {
+      final productIds = await remoteDataSource.getFavouriteProductsId(userId);
+      return Right(productIds);
+    } catch (e) {
+      return Left(Failure('Failed to fetch favorite products'));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, void>> toggleFavorite(String userId, int productId, bool isFavorite) async {
+      try {
+      await remoteDataSource.toggleFavorite(userId, productId, isFavorite);
+      return const Right(null);
+    } catch (e) {
+      return Left(Failure('Failed to toggle favorite'));
+    }
+  }
 }

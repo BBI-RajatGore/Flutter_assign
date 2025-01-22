@@ -13,7 +13,9 @@ import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ecommerce_app/features/product/data/datasource/remote_data_source.dart';
 import 'package:ecommerce_app/features/product/data/repositories/repository_imp.dart';
 import 'package:ecommerce_app/features/product/domain/repositories/repositories.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/get_favourite_products_id_usercase.dart';
 import 'package:ecommerce_app/features/product/domain/usecase/get_products_usecase.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/toggle_favourite_usecase.dart';
 import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/profile/data/datasource/remote_data_source.dart';
 import 'package:ecommerce_app/features/profile/data/repositories/profile_repositories_impl.dart';
@@ -149,9 +151,7 @@ Future<void> serviceLocator() async {
   );
 
   getIt.registerLazySingleton<ProductRemoteDataSource>(
-    () => ProductRemoteDataSourceImpl(
-      getIt(),
-    ),
+    () => ProductRemoteDataSourceImpl(getIt(), getIt()),
   );
 
   getIt.registerLazySingleton<ProductRepository>(
@@ -166,10 +166,23 @@ Future<void> serviceLocator() async {
     ),
   );
 
+  getIt.registerLazySingleton<ToggleFavouriteUsecase>(
+    () => ToggleFavouriteUsecase(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<GetFavouriteProductsIdUsercase>(
+    () => GetFavouriteProductsIdUsercase(
+      getIt(),
+    ),
+  );
+
   getIt.registerFactory<ProductBloc>(
     () => ProductBloc(
       getProductsUsecase: getIt(),
+      toggleFavouriteUsecase: getIt(),
+      getFavouriteProductsIdUsercase: getIt(),
     ),
   );
-  
 }

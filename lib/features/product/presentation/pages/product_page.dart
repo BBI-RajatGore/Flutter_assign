@@ -1,5 +1,8 @@
 import 'package:ecommerce_app/features/product/domain/entities/product_model.dart';
 import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
+import 'package:ecommerce_app/features/product/presentation/pages/product_details_page.dart';
+import 'package:ecommerce_app/features/product/presentation/widget/product_card.dart';
+import 'package:ecommerce_app/features/product/presentation/widget/product_rating_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -11,14 +14,6 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  final List<String> productImages = [
-    'https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/1.png',
-    'https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/1.png',
-    'https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/1.png',
-    'https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/1.png',
-    'https://cdn.dummyjson.com/products/images/beauty/Red%20Lipstick/1.png',
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -60,8 +55,6 @@ class _ProductPageState extends State<ProductPage> {
           Expanded(
             child: BlocBuilder<ProductBloc, ProductState>(
               builder: (context, state) {
-                print("in product page satet is ${state}");
-
                 if (state is ProductLoading) {
                   return _buildShimmerEffect();
                 } else if (state is ProductLoaded) {
@@ -84,17 +77,20 @@ class _ProductPageState extends State<ProductPage> {
         if (state is ProductLoading) {
           return _buildShimmerCarousel();
         } else if (state is ProductLoaded) {
+          List<ProductModel> carouselProducts = state.products.take(5).toList();
+
           return CarouselSlider(
             options: CarouselOptions(
-              height: 220,
+              height: 250,
               autoPlay: true,
               enlargeCenterPage: true,
               autoPlayInterval: const Duration(seconds: 3),
-              viewportFraction: 0.70,
-              aspectRatio: 20 / 10,
+              viewportFraction: 0.85,
+              aspectRatio: 16 / 9,
               autoPlayCurve: Curves.easeInOut,
+              onPageChanged: (index, reason) {},
             ),
-            items: productImages.map((imageUrl) {
+            items: carouselProducts.map((product) {
               return Builder(
                 builder: (BuildContext context) {
                   return AnimatedContainer(
@@ -104,16 +100,46 @@ class _ProductPageState extends State<ProductPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15.0),
                       image: DecorationImage(
-                        image: NetworkImage(imageUrl),
+                        image: NetworkImage(product.image),
                         fit: BoxFit.cover,
                       ),
-                      // boxShadow: const [
-                      //   BoxShadow(
-                      //     color: Colors.black26,
-                      //     blurRadius: 8,
-                      //     offset: Offset(0, 4),
-                      //   ),
-                      // ],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.black.withOpacity(0.4),
+                                  Colors.transparent,
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 10,
+                          left: 10,
+                          child: Text(
+                            product.title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -223,100 +249,97 @@ class _ProductPageState extends State<ProductPage> {
       ),
       itemCount: products.length,
       itemBuilder: (context, index) {
-        return _buildProductCard(products[index]);
+        // return _buildProductCard(products[index]);
+        return ProductCard( product:  products[index]);
       },
     );
   }
 
-  Widget _buildProductCard(ProductModel product) {
-    return GestureDetector(
-      onTap: () {},
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        elevation: 8,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    topRight: Radius.circular(15.0),
-                  ),
-                  child: Image.network(
-                    product.image,
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: IconButton(
-                      icon:
-                          const Icon(Icons.favorite_border, color: Colors.red),
-                      onPressed: () {},
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildRatingStars(product.rate),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRatingStars(double rating) {
-    int fullStars = rating.floor();
-    double fraction = rating - fullStars;
-    return Row(
-      children: List.generate(5, (index) {
-        if (index < fullStars) {
-          return const Icon(Icons.star,
-              color: Color.fromARGB(255, 255, 230, 0), size: 20);
-        } else if (index == fullStars && fraction > 0) {
-          return const Icon(Icons.star_half,
-              color: Color.fromARGB(255, 255, 230, 0), size: 20);
-        } else {
-          return const Icon(Icons.star_border,
-              color: Color.fromARGB(255, 255, 230, 0), size: 20);
-        }
-      }),
-    );
-  }
+//   Widget _buildProductCard(ProductModel product) {
+//     return GestureDetector(
+//       onTap: () {
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => ProductDetailsPage(product: product),
+//           ),
+//         );
+//       },
+//       child: Card(
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(15.0),
+//         ),
+//         elevation: 8,
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: [
+//             Stack(
+//               children: [
+//                 ClipRRect(
+//                     borderRadius: const BorderRadius.only(
+//                       topLeft: Radius.circular(15.0),
+//                       topRight: Radius.circular(15.0),
+//                     ),
+//                     child: Container(
+//                       color: Colors
+//                           .primaries[product.id % Colors.primaries.length]
+//                           .withOpacity(0.1),
+//                       child: Image.network(
+//                         product.image,
+//                         height: 150,
+//                         width: double.infinity,
+//                         fit: BoxFit.cover,
+//                       ),
+//                     )),
+//                 Positioned(
+//                   top: 8,
+//                   right: 8,
+//                   child: CircleAvatar(
+//                     backgroundColor: Colors.white,
+//                     child: IconButton(
+//                       icon: (product.isFavorite)
+//                           ? const Icon(Icons.favorite, color: Colors.red)
+//                           : const Icon(Icons.favorite_border),
+//                       onPressed: () {
+//                          BlocProvider.of<ProductBloc>(context)
+//                             .add(ToggleFavoriteEvent(product.id));
+//                       },
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.all(8.0),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     product.title,
+//                     style: const TextStyle(
+//                       fontSize: 16,
+//                       fontWeight: FontWeight.w600,
+//                       color: Colors.black87,
+//                     ),
+//                     maxLines: 2,
+//                     overflow: TextOverflow.ellipsis,
+//                   ),
+//                   const SizedBox(height: 4),
+//                   Text(
+//                     '\$${product.price.toStringAsFixed(2)}',
+//                     style: const TextStyle(
+//                       fontSize: 14,
+//                       color: Colors.grey,
+//                     ),
+//                   ),
+//                   const SizedBox(height: 4),
+//                   ProductRatingWidget(rating: product.rate),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 }

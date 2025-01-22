@@ -14,6 +14,13 @@ class ProductLoaded extends ProductState {
 
 }
 
+
+class FavoriteProductsLoaded extends ProductState {
+  final List<int> favoriteProductIds;
+
+  FavoriteProductsLoaded(this.favoriteProductIds);
+}
+
 class ProductError extends ProductState {
   final String message;
 
