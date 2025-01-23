@@ -5,16 +5,20 @@ import 'package:ecommerce_app/features/profile/presentation/pages/profile_page.d
 import 'package:flutter/material.dart';
 
 class BottomNavigationPage extends StatefulWidget {
+
   @override
   _BottomNavigationPageState createState() => _BottomNavigationPageState();
+
 }
 
 class _BottomNavigationPageState extends State<BottomNavigationPage> {
-  int _selectedIndex = 0;
+
+  var _selectedIndex=0;
+
 
   final List<Widget> _pages = [
     ProductPage(),
-    CartPage(),
+    const CartPage(),
     WishlistPage(),
     ProfilePage()
   ];
@@ -27,6 +31,7 @@ class _BottomNavigationPageState extends State<BottomNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),

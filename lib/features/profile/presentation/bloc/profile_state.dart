@@ -37,5 +37,5 @@ class ProfileUpdatedSuccess extends ProfileState {
 
 
 class ProfileSetupComplete extends ProfileState{
-
 }
+

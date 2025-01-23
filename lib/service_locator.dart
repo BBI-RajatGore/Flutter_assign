@@ -13,10 +13,14 @@ import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ecommerce_app/features/product/data/datasource/remote_data_source.dart';
 import 'package:ecommerce_app/features/product/data/repositories/repository_imp.dart';
 import 'package:ecommerce_app/features/product/domain/repositories/repositories.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/add_item_to_cart_usecase.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/get_cart_items_usecase.dart';
 import 'package:ecommerce_app/features/product/domain/usecase/get_favourite_products_id_usercase.dart';
 import 'package:ecommerce_app/features/product/domain/usecase/get_products_usecase.dart';
+import 'package:ecommerce_app/features/product/domain/usecase/remove_item_from_cart_usecase.dart';
 import 'package:ecommerce_app/features/product/domain/usecase/toggle_favourite_usecase.dart';
-import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/cart_bloc/cart_bloc.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/profile/data/datasource/remote_data_source.dart';
 import 'package:ecommerce_app/features/profile/data/repositories/profile_repositories_impl.dart';
 import 'package:ecommerce_app/features/profile/domain/repositories/profile_repositories.dart';
@@ -145,7 +149,6 @@ Future<void> serviceLocator() async {
   );
 
   // product feature
-
   getIt.registerLazySingleton(
     () => http.Client(),
   );
@@ -185,4 +188,33 @@ Future<void> serviceLocator() async {
       getFavouriteProductsIdUsercase: getIt(),
     ),
   );
+
+  // cart feature
+  getIt.registerLazySingleton<AddItemToCartUsecase>(
+    () => AddItemToCartUsecase(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<GetCartItemsUsecase>(
+    () => GetCartItemsUsecase(
+      getIt(),
+    ),
+  );
+
+  getIt.registerLazySingleton<RemoveItemFromCartUsecase>(
+    () => RemoveItemFromCartUsecase(
+      getIt(),
+    ),
+  );
+
+  getIt.registerFactory<CartBloc>(
+    () => CartBloc(
+      getProductsUsecase: getIt(),
+      addItemToCart: getIt(),
+      getCartItems: getIt(),
+      removeItemFromCart: getIt(),
+    ),
+  );
+
 }

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_event.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_state.dart';
 
+
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final SaveProfileUseCase saveProfileUseCase;
   final UpdateprofileUsecase updateprofileUsecase;
@@ -31,6 +32,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<UpdateProfileEvent>(_onUpdateProfile);
     on<GetProfileEvent>(_onGetProfile);
     on<ClearProfileModelEvent>(_onclearProfileModelEvent);
+    on<OrderPlacedEvent>(_orderPlacedEvent);
   }
 
   Future<void> _onSaveProfile(
@@ -112,6 +114,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     add(GetProfileEvent());
   }
 
-
+  Future<void> _orderPlacedEvent(OrderPlacedEvent event,Emitter<ProfileState> emit) async{
+    emit(ProfileSetupComplete());
+  }
 
 }

@@ -56,16 +56,18 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         'imageUrl': profileModel.imageUrl,
       });
 
-      return Right(null); 
+      return const Right(null); 
+
     } catch (e) {
+
       return Left(Failure('Error updating profile: ${e.toString()}'));
+      
     }
   }
 
   @override
   Future<Either<Failure, void>> saveProfile(ProfileModel profileModel, String userId) async {
     try {
-      String? imageUrl;
 
       await _firebaseFirestore.collection('profiles').doc(userId).set({
         'username': profileModel.username,
@@ -75,8 +77,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       });
 
       return const  Right(null);
+
     } catch (e) {
+
       return Left(Failure('Error saving profile: ${e.toString()}'));
+
     }
   }
 

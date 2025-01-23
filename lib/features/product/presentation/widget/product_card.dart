@@ -1,4 +1,4 @@
-import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/product/presentation/pages/product_details_page.dart';
 import 'package:ecommerce_app/features/product/presentation/widget/product_rating_widget.dart';
 import 'package:flutter/material.dart';

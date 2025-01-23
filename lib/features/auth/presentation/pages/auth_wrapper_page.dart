@@ -38,12 +38,14 @@ class AuthStateWrapper extends StatelessWidget {
   }
 
   Widget _handleProfileState(BuildContext context) {
+
     BlocProvider.of<ProfileBloc>(context).getProfile();
 
     return BlocBuilder<ProfileBloc, ProfileState>(
       builder: (context, profileState) {
         if (profileState is ProfileSetupComplete ||
             profileState is ProfileStatusCompleteState) {
+              print("herrrrrrr ${profileState}");
           return BottomNavigationPage();
         } else if (profileState is ProfileInitialState ||
             profileState is ProfileLoadingState) {

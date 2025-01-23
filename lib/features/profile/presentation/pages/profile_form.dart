@@ -6,7 +6,6 @@ import 'package:ecommerce_app/features/profile/presentation/bloc/profile_state.d
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -19,13 +18,13 @@ class ProfileForm extends StatefulWidget {
 }
 
 class _ProfileFormState extends State<ProfileForm> {
+
   final User? user = FirebaseAuth.instance.currentUser;
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
   String selectedImageUrl = "";
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -289,15 +288,6 @@ class _ProfileFormState extends State<ProfileForm> {
           user!.uid,
         ),
       );
-
-      // showTopSnackBar(
-      //   displayDuration: const Duration(milliseconds: 3),
-      //   Overlay.of(context),
-      //   CustomSnackBar.success(
-      //     backgroundColor: Colors.teal,
-      //     message: 'Welcome ${_usernameController.text.trim()}',
-      //   ),
-      // );
     }
   }
 
@@ -363,14 +353,5 @@ class _ProfileFormState extends State<ProfileForm> {
         ),
       );
     }
-
-    // showTopSnackBar(
-    //   displayDuration: const Duration(milliseconds: 3),
-    //   Overlay.of(context),
-    //   CustomSnackBar.success(
-    //     backgroundColor: Colors.teal,
-    //     message: 'Welcome $username',
-    //   ),
-    // );
   }
 }

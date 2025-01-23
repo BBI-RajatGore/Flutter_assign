@@ -1,21 +1,25 @@
 import 'package:ecommerce_app/core/utils/constants.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:ecommerce_app/features/auth/presentation/bloc/auth_event.dart';
-import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc.dart';
+import 'package:ecommerce_app/features/product/presentation/bloc/product_bloc/product_bloc.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_event.dart';
+import 'package:ecommerce_app/features/profile/presentation/widget/profile_shimmer_effect.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProfilePage extends StatefulWidget {
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
+
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   var profileModel = ProfileModel(
     username: "",
     phoneNumber: "",
@@ -23,14 +27,9 @@ class _ProfilePageState extends State<ProfilePage> {
     imageUrl: "",
   );
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<ProfileModel> _getProfile() async {
     final profileBloc = context.read<ProfileBloc>();
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 500));
     final userId = FirebaseAuth.instance.currentUser!.uid;
     final profile = await profileBloc.onGetProfileForProfilePage(userId);
     return profile;
@@ -42,12 +41,25 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
-          "Profile Page",
-          style: TextStyle(
-            color: Colors.teal,
-            fontWeight: FontWeight.w600,
-          ),
+        title: RichText(
+          text: const TextSpan(children: [
+            TextSpan(
+              text: "Your ",
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.teal,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            TextSpan(
+              text: "Cart",
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.grey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ]),
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -80,84 +92,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: _buildProfileContent(),
               );
             } else {
-              return _buildShimmerLoading();
+              return const ProfileShimmerEffect();
             }
           }),
     );
   }
 
-  Widget _buildShimmerLoading() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: const CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width: 200,
-              height: 24,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          _buildShimmerProfileInfo(),
-          const SizedBox(height: 10),
-          _buildShimmerProfileInfo(),
-          const SizedBox(height: 10),
-          _buildShimmerProfileInfo(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildShimmerProfileInfo() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Card(
-        elevation: 2,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: Colors.grey,
-            width: 1,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  height: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildProfileContent() {
     return Column(
@@ -323,6 +263,7 @@ class _ProfilePageState extends State<ProfilePage> {
       BlocProvider.of<ProductBloc>(context).add(ClearProductListEvent());
 
       Navigator.pop(context);
+
     } catch (e) {
       Constants.showErrorSnackBar(context, "Error while logging out");
     }

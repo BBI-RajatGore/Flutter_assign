@@ -8,11 +8,12 @@ part 'product_event.dart';
 part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
+  
   final GetProductsUsecase getProductsUsecase;
   final GetFavouriteProductsIdUsercase getFavouriteProductsIdUsercase;
   final ToggleFavouriteUsecase toggleFavouriteUsecase;
 
-  List<ProductModel> _productModel = [];
+  List<ProductModel> _productList = [];
 
   ProductBloc(
       {required this.getProductsUsecase,
@@ -25,33 +26,12 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     on<ClearProductListEvent>(_clearProductList);
   }
 
-  // Future<void> _getProductEvent(
-  //     GetProductEvent event, Emitter<ProductState> emit) async {
-
-  //   emit(ProductLoading());
-
-  //   if(_productModel.isNotEmpty){
-  //     emit(ProductLoaded(_productModel));
-  //     return ;
-  //   }
-
-  //   final  response = await getProductsUsecase.call();
-
-  //   response.fold((left) {
-  //     emit(ProductError(left.message));
-  //   }, (right) {
-  //     _productModel = right;
-  //     emit(ProductLoaded(right));
-  //   });
-  // }
-
   Future<void> _getProductEvent(
       GetProductEvent event, Emitter<ProductState> emit) async {
     emit(ProductLoading());
 
-    if (_productModel.isNotEmpty) {
-      print("not calledd at firsttttt");
-      emit(ProductLoaded(_productModel));
+    if (_productList.isNotEmpty) {
+      emit(ProductLoaded(_productList));
       return;
     }
 
@@ -62,37 +42,33 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         emit(ProductError(failure.message));
       },
       (products) async {
-        _productModel = products;
+        _productList = products;
         add(LoadFavoriteProductsIdEvent());
       },
     );
   }
 
-  Future<void> _loadFavouriteProductIdEvent(LoadFavoriteProductsIdEvent event, Emitter<ProductState> emit) async {
-
+  Future<void> _loadFavouriteProductIdEvent(
+      LoadFavoriteProductsIdEvent event, Emitter<ProductState> emit) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
-    final favouriteIdsResponse = await getFavouriteProductsIdUsercase.call(userId);
+    final favouriteIdsResponse =
+        await getFavouriteProductsIdUsercase.call(userId);
 
-    favouriteIdsResponse.fold(
-    (failure) {
-
-      emit(ProductLoaded(_productModel));
+    favouriteIdsResponse.fold((failure) {
+      emit(ProductLoaded(_productList));
     }, (favoriteIds) {
-      for (var product in _productModel) {
+      for (var product in _productList) {
         product.isFavorite = favoriteIds.contains(product.id);
       }
 
-      emit(ProductLoaded(_productModel));
+      emit(ProductLoaded(_productList));
     });
   }
 
-
   Future<void> _toggleFavoriteEvent(
-
       ToggleFavoriteEvent event, Emitter<ProductState> emit) async {
-
     final userId = FirebaseAuth.instance.currentUser!.uid;
-    final product = _productModel.firstWhere((p) => p.id == event.productId);
+    final product = _productList.firstWhere((p) => p.id == event.productId);
 
     final newIsFavorite = !product.isFavorite;
 
@@ -105,16 +81,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       },
       (_) {
         product.isFavorite = newIsFavorite;
-        emit(ProductLoaded(_productModel)); 
+        emit(ProductLoaded(_productList));
       },
     );
   }
 
-  Future<void> _clearProductList(ClearProductListEvent event , Emitter<ProductState> emit)async{
-    _productModel = [];
+  Future<void> _clearProductList(
+      ClearProductListEvent event, Emitter<ProductState> emit) async {
+    _productList = [];
     emit(ProductInitial());
   }
-
-
 
 }

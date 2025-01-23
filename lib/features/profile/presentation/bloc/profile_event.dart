@@ -30,4 +30,6 @@ class GetProfileForProfilePage extends  ProfileEvent {
 
 class ClearProfileModelEvent extends ProfileEvent{} 
 
+class OrderPlacedEvent extends ProfileEvent{}
+
 

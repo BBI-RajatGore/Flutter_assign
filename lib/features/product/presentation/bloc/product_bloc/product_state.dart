@@ -14,7 +14,6 @@ class ProductLoaded extends ProductState {
 
 }
 
-
 class FavoriteProductsLoaded extends ProductState {
   final List<int> favoriteProductIds;
 

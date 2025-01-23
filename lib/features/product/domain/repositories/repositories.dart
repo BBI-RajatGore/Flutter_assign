@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/core/error/failure.dart';
+import 'package:ecommerce_app/features/product/domain/entities/cart_model.dart';
 import 'package:ecommerce_app/features/product/domain/entities/product_model.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -6,4 +7,7 @@ abstract class ProductRepository {
   Future<Either<Failure, List<ProductModel>>> getProducts();
   Future<Either<Failure,void>> toggleFavorite(String userId,int productId,bool isFavorite);
   Future<Either<Failure,List<int>>> getFavouriteProductsId(String userId);
+  Future<void> addItemToCart(String userId, CartModel cartItem);
+  Future<void> removeItemFromCart(String userId, CartModel cartItem);
+  Future<List<CartModel>> getCartItems(String userId);
 }
