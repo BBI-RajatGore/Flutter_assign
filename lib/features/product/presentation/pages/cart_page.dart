@@ -1,11 +1,11 @@
-import 'package:ecommerce_app/features/product/domain/entities/cart_model.dart';
 import 'package:ecommerce_app/features/product/presentation/bloc/cart_bloc/cart_bloc.dart';
 import 'package:ecommerce_app/features/product/presentation/bloc/cart_bloc/cart_event.dart';
 import 'package:ecommerce_app/features/product/presentation/bloc/cart_bloc/cart_state.dart';
-import 'package:ecommerce_app/features/product/presentation/pages/shipping_details_page.dart';
-
+import 'package:ecommerce_app/features/product/presentation/widget/cart_page_widgets/cart_item_widget.dart';
+import 'package:ecommerce_app/features/product/presentation/widget/cart_page_widgets/shimmer_cart_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:ecommerce_app/features/product/domain/entities/cart_model.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -17,8 +17,7 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   @override
   void initState() {
-    print("calleddd");
-    BlocProvider.of<CartBloc>(context).add(GetCartEvent());
+    BlocProvider.of<CartBloc>(context).add(LoadCartFunction());
     super.initState();
   }
 
@@ -27,43 +26,91 @@ class _CartPageState extends State<CartPage> {
         0.0, (sum, item) => sum + (item.product?.price ?? 0.0) * item.quantity);
   }
 
+  void showPaymentSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.teal,
+                    ),
+                    padding: const EdgeInsets.all(15),
+                    child: const Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                      size: 50,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Payment Successful!",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Your payment has been processed successfully. Thank you!",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      backgroundColor: Colors.teal,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "OK",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: RichText(
-          text: const TextSpan(children: [
-            TextSpan(
-              text: "Your ",
-              style: TextStyle(
-                fontSize: 24,
-                color: Colors.teal,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            TextSpan(
-              text: "Cart",
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.grey,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ]),
-        ),
+        title: const Text("Your Cart"),
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
       ),
       body: BlocBuilder<CartBloc, CartState>(
         builder: (context, state) {
-          if(state is CartLoading){
-            return const Center(child: CircularProgressIndicator(),);
-          }
-          else if (state is CartLoaded) {
+          if (state is CartLoading) {
+            return const ShimmerLoadingWidget();
+          } else if (state is CartLoaded) {
             if (state.cartItems.isEmpty) {
-
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -76,7 +123,7 @@ class _CartPageState extends State<CartPage> {
                         color: Colors.teal,
                         fontSize: 20,
                         fontWeight: FontWeight.w500),
-                  )
+                  ),
                 ],
               );
             }
@@ -89,140 +136,7 @@ class _CartPageState extends State<CartPage> {
                   child: ListView.builder(
                     itemCount: state.cartItems.length,
                     itemBuilder: (context, index) {
-                      final cartItem = state.cartItems[index];
-                      final product = cartItem.product;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8.0,
-                          horizontal: 16.0,
-                        ),
-                        child: Card(
-                          elevation: 5,
-                          child: Container(
-                            padding: const EdgeInsets.all(12.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: product?.image != null
-                                      ? Image.network(
-                                          product!.image,
-                                          width: 60,
-                                          height: 60,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Icon(
-                                          Icons.shopping_cart,
-                                          size: 60,
-                                        ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        product?.title ?? "Unknown Product",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "\$${product?.price.toStringAsFixed(2) ?? 'N/A'} USD",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () {
-                                        if (cartItem.quantity > 1) {
-                                          BlocProvider.of<CartBloc>(context)
-                                              .add(
-                                            AddToCartEvent(
-                                              productId: cartItem.productId,
-                                              quantity: cartItem.quantity - 1,
-                                            ),
-                                          );
-                                        } else {
-                                          BlocProvider.of<CartBloc>(context)
-                                              .add(
-                                            RemoveFromCartEvent(
-                                              productId: cartItem.productId,
-                                              quantity: cartItem.quantity,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    Text(
-                                      cartItem.quantity.toString(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
-                                        color: Colors.green,
-                                      ),
-                                      onPressed: () {
-                                        BlocProvider.of<CartBloc>(context).add(
-                                          AddToCartEvent(
-                                            productId: cartItem.productId,
-                                            quantity: cartItem.quantity + 1,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () {
-                                    BlocProvider.of<CartBloc>(context).add(
-                                      RemoveFromCartEvent(
-                                        productId: cartItem.productId,
-                                        quantity: cartItem.quantity,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      return CartItemWidget(cartItem: state.cartItems[index]);
                     },
                   ),
                 ),
@@ -310,13 +224,7 @@ class _CartPageState extends State<CartPage> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        onPressed: () {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => ShippingDetailsPage(),
-                          //   ),
-                          // );
-                        },
+                        onPressed: () => showPaymentSuccessDialog(context),
                         child: const Center(
                           child: Text(
                             "Checkout",

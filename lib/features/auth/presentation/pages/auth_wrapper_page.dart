@@ -45,7 +45,6 @@ class AuthStateWrapper extends StatelessWidget {
       builder: (context, profileState) {
         if (profileState is ProfileSetupComplete ||
             profileState is ProfileStatusCompleteState) {
-              print("herrrrrrr ${profileState}");
           return BottomNavigationPage();
         } else if (profileState is ProfileInitialState ||
             profileState is ProfileLoadingState) {

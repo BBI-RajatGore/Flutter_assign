@@ -1,4 +1,5 @@
 import 'package:ecommerce_app/core/utils/constants.dart';
+import 'package:ecommerce_app/core/widgets/app_bar_widget.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:ecommerce_app/features/profile/presentation/bloc/profile_event.dart';
@@ -57,13 +58,7 @@ class _ProfileFormState extends State<ProfileForm> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          (widget.isEdit) ? 'Update Profile' : 'Complete Profile',
-          style: const TextStyle(
-            color: Colors.teal,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        title: (widget.isEdit) ? const  AppBarWidget(title: "Update ", subtitle: "Profile") : const AppBarWidget(title: "Setup ", subtitle: "Profile"),
         actions: [
           (widget.isEdit)
               ? Container()

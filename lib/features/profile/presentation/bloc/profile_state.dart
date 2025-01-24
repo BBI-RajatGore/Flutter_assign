@@ -18,9 +18,7 @@ class ProfileErrorState extends ProfileState {
   ProfileErrorState(this.message);
 }
 
-class ProfileStatusCompleteState extends ProfileState {
-
-}
+class ProfileStatusCompleteState extends ProfileState {}
 
 class ProfileStatusIncompleteState extends ProfileState {
   final ProfileModel profileModel;
@@ -28,14 +26,10 @@ class ProfileStatusIncompleteState extends ProfileState {
   ProfileStatusIncompleteState(this.profileModel);
 }
 
-
 class ProfileUpdatedSuccess extends ProfileState {
   final ProfileModel profileModel;
 
   ProfileUpdatedSuccess(this.profileModel);
 }
 
-
-class ProfileSetupComplete extends ProfileState{
-}
-
+class ProfileSetupComplete extends ProfileState {}

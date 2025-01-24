@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ProfileBloc>(create: (context) => getIt<ProfileBloc>()),
         BlocProvider<ProductBloc>(create: (context) => getIt<ProductBloc>()),
-        BlocProvider<CartBloc>(create: (context) => getIt<CartBloc>()..add(GetProductEventForCart())),
+        BlocProvider<CartBloc>(create: (context) => getIt<CartBloc>()..add(GetProductEventForCart(),),),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

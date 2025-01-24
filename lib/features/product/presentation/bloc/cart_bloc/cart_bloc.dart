@@ -29,6 +29,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<AddToCartEvent>(_onAddToCart);
     on<RemoveFromCartEvent>(_onRemoveFromCart);
     on<GetCartEvent>(_onGetCartItems);
+     on<LoadCartFunction>(_loadCartFunction);
   }
 
 
@@ -41,21 +42,19 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       },
       (products) {
         _productMap = {for (var product in products) product.id: product};
-        print("product map.....");
-        print(_productMap);
       },
     );
   }
 
 
   Future<void> _onAddToCart(AddToCartEvent event, Emitter<CartState> emit) async {
-    print("is this adding");
+
     final userId = FirebaseAuth.instance.currentUser!.uid;
     try {
       if (_productMap.containsKey(event.productId)) {
         final product = _productMap[event.productId]!;
         final cartItem = CartModel(productId: product.id, quantity: event.quantity);
-        print("added cart item in bloc ${cartItem.quantity}");
+
         await addItemToCart(userId, cartItem);
 
         add(GetCartEvent());
@@ -104,5 +103,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     }
   }
+
+
+  Future<void> _loadCartFunction(LoadCartFunction event, Emitter<CartState> emit) async {
+    emit(CartLoading());
+    add(GetCartEvent());
+  }
+
+
+
+
 
 }

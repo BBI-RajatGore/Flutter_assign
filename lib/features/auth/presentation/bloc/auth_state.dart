@@ -19,10 +19,7 @@ class AuthFailure extends AuthState {
 
 class AuthSignedOut extends AuthState {}
 
-class UserPresent extends AuthState {
-  final String uid;
-  UserPresent(this.uid);
-}
+
 
 
 

@@ -175,8 +175,8 @@ Future<void> serviceLocator() async {
     ),
   );
 
-  getIt.registerLazySingleton<GetFavouriteProductsIdUsercase>(
-    () => GetFavouriteProductsIdUsercase(
+  getIt.registerLazySingleton<GetFavouriteProductsIdUsecase>(
+    () => GetFavouriteProductsIdUsecase(
       getIt(),
     ),
   );
@@ -185,7 +185,7 @@ Future<void> serviceLocator() async {
     () => ProductBloc(
       getProductsUsecase: getIt(),
       toggleFavouriteUsecase: getIt(),
-      getFavouriteProductsIdUsercase: getIt(),
+      getFavouriteProductsIdUsecase: getIt(),
     ),
   );
 

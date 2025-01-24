@@ -108,7 +108,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } catch (e) {
-      print("Error in resetting password: $e");
       return Left(Failure("Error while resetting password"));
     }
   }

@@ -1,8 +1,8 @@
 class CartEvent {}
 
-class GetProductEventForCart extends CartEvent{}
-class AddToCartEvent extends CartEvent {
+class GetProductEventForCart extends CartEvent {}
 
+class AddToCartEvent extends CartEvent {
   final int productId;
   final int quantity;
 
@@ -13,21 +13,17 @@ class AddToCartEvent extends CartEvent {
 }
 
 class RemoveFromCartEvent extends CartEvent {
-
   final int productId;
   final int quantity;
 
   RemoveFromCartEvent({
-
     required this.productId,
     required this.quantity,
   });
 }
 
-class GetCartEvent extends CartEvent {
+class GetCartEvent extends CartEvent {}
 
-}
+class UpdateCartQuantityEvent extends CartEvent {}
 
-class UpdateCartQuantityEvent extends CartEvent {
-
-}
+class LoadCartFunction extends CartEvent {}

@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 class ProductGridWidget extends StatelessWidget {
 
   final  List<ProductModel> products;
+
+  final isWishList;
   
-  const ProductGridWidget({super.key,required this.products});
+  const ProductGridWidget({super.key,required this.products,required this.isWishList});
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,  
-      physics: const NeverScrollableScrollPhysics(), 
+      physics: (isWishList)? null : const  NeverScrollableScrollPhysics(), 
       padding: const EdgeInsets.all(8.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

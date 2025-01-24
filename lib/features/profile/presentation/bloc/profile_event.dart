@@ -18,18 +18,19 @@ class UpdateProfileEvent extends ProfileEvent {
 
 class GetProfileEvent extends ProfileEvent {}
 
-class CheckProfileStatusEvent extends ProfileEvent {}
-
-
-class GetProfileForProfilePage extends  ProfileEvent {
-  final String userId;
-
-  GetProfileForProfilePage(this.userId);
-}
-
-
 class ClearProfileModelEvent extends ProfileEvent{} 
 
 class OrderPlacedEvent extends ProfileEvent{}
+
+
+
+// class CheckProfileStatusEvent extends ProfileEvent {}
+
+
+// class GetProfileForProfilePage extends  ProfileEvent {
+//   final String userId;
+
+//   GetProfileForProfilePage(this.userId);
+// }
 
 

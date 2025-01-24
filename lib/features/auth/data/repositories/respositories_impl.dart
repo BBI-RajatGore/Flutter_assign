@@ -38,9 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure,String?>> getCurrentUserIdFromLocal() async {
     try{
       final userId = await authLocalDataSource.getUserId();
-      print("userId in repository impl : $userId");
       if(userId == null){
-        print("Local data source returned null i.e id");
         return Left(Failure("No user id found"),);
       }
       return Right(userId);
