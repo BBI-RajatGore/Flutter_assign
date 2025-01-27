@@ -3,29 +3,35 @@ import 'package:ecommerce_app/features/product/presentation/widget/product_card.
 import 'package:flutter/material.dart';
 
 class ProductGridWidget extends StatelessWidget {
+  final List<ProductModel> products;
+  final bool isWishList;
 
-  final  List<ProductModel> products;
-
-  final isWishList;
-  
-  const ProductGridWidget({super.key,required this.products,required this.isWishList});
+  const ProductGridWidget({super.key, required this.products, required this.isWishList});
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,  
-      physics: (isWishList)? null : const  NeverScrollableScrollPhysics(), 
-      padding: const EdgeInsets.all(8.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12.0,
-        mainAxisSpacing: 12.0,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return ProductCard(product: products[index]);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+
+        int crossAxisCount = (constraints.maxWidth ~/ 200).clamp(2, 3); 
+        double childAspectRatio = constraints.maxWidth < 600 ? 0.7 : 0.85;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: isWishList ? null : const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(8.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12.0,
+            mainAxisSpacing: 12.0,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            return ProductCard(product: products[index]);
+          },
+        );
       },
-    );;
+    );
   }
 }

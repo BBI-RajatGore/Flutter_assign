@@ -10,6 +10,7 @@ import 'package:ecommerce_app/features/profile/presentation/bloc/profile_state.d
 
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
+  
   final SaveProfileUseCase saveProfileUseCase;
   final UpdateprofileUsecase updateprofileUsecase;
   final GetprofileUsecase getProfileUsecase;

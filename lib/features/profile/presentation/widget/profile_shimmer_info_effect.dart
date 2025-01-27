@@ -38,6 +38,6 @@ class ProfileShimmerInfoEffect extends StatelessWidget {
           ),
         ),
       ),
-    );;
+    );
   }
 }

@@ -73,6 +73,7 @@ class _ProductCardState extends State<ProductCard> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -94,7 +95,12 @@ class _ProductCardState extends State<ProductCard> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  ProductRatingWidget(rating: widget.product.rate),
+                  Row(
+                    children: [
+                      ProductRatingWidget(rating: widget.product.rate),
+                      Text("(${widget.product.rate.toString()})",style: const TextStyle(color: Colors.grey),),
+                    ],
+                  )
                 ],
               ),
             ),
