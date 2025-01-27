@@ -9,6 +9,7 @@ import 'package:ecommerce_app/features/profile/presentation/widget/profile_info_
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/features/profile/domain/entities/profile_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 class ProfileContent extends StatelessWidget {
   final ProfileModel profileModel;
 

@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ProductCard extends StatefulWidget {
   final product;
 
-  const ProductCard({super.key,required this.product});
+  const ProductCard({super.key, required this.product});
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -16,12 +16,12 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
-    return  GestureDetector(
+    return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductDetailsPage(product:  widget.product),
+            builder: (context) => ProductDetailsPage(product: widget.product),
           ),
         );
       },
@@ -36,21 +36,22 @@ class _ProductCardState extends State<ProductCard> {
             Stack(
               children: [
                 ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15.0),
-                      topRight: Radius.circular(15.0),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                  child: Container(
+                    color: Colors
+                        .primaries[widget.product.id % Colors.primaries.length]
+                        .withOpacity(0.1),
+                    child: Image.network(
+                      widget.product.image,
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     ),
-                    child: Container(
-                      color: Colors
-                          .primaries[widget.product.id % Colors.primaries.length]
-                          .withOpacity(0.1),
-                      child: Image.network(
-                        widget.product.image,
-                        height: 150,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    )),
+                  ),
+                ),
                 Positioned(
                   top: 8,
                   right: 8,
@@ -61,7 +62,7 @@ class _ProductCardState extends State<ProductCard> {
                           ? const Icon(Icons.favorite, color: Colors.red)
                           : const Icon(Icons.favorite_border),
                       onPressed: () {
-                         BlocProvider.of<ProductBloc>(context)
+                        BlocProvider.of<ProductBloc>(context)
                             .add(ToggleFavoriteEvent(widget.product.id));
                       },
                     ),

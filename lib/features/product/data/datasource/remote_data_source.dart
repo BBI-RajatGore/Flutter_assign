@@ -88,8 +88,6 @@ Future<void> toggleFavorite(String userId, int productId, bool isFavorite) async
   Future<void> addItemToCart(String userId, CartModel cartItem) async {
     final productId = cartItem.productId.toString(); 
     final quantity = cartItem.quantity;
-    print("receiveed quant");
-    print(quantity);
     final productRef = _firebaseFirestore.collection('carts').doc(userId).collection('products').doc(productId);
 
     final productSnapshot = await productRef.get();
